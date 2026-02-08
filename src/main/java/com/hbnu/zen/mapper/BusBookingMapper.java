@@ -22,6 +22,10 @@ public interface BusBookingMapper {
     int countBooked(@Param("tripId") Long tripId,
                     @Param("status") String status);
 
+    int countAll();
+
+    int countByStatus(@Param("status") String status);
+
     BusBooking selectEarliestWaitlist(@Param("tripId") Long tripId,
                                       @Param("status") String status);
 

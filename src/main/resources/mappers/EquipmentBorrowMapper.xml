@@ -76,6 +76,14 @@
           and end_time &gt; #{startTime}
     </select>
 
+    <select id="countAll" resultType="int">
+        select count(1) from equipment_borrow
+    </select>
+
+    <select id="countByStatus" resultType="int">
+        select count(1) from equipment_borrow where status = #{status}
+    </select>
+
     <select id="selectPendingViews" resultMap="BorrowViewMap">
         select b.id,
                b.equipment_id,

@@ -36,6 +36,7 @@ const navItems = [
 
 const adminItems = [
   { label: '审批处理', to: '/approvals', icon: 'M6 4h12v2H6V4zm0 5h12v2H6V9zm0 5h12v2H6v-2z' },
+  { label: '运营报表', to: '/admin/reports', icon: 'M3 3h18v2H3V3zm2 4h3v10H5V7zm5 4h3v6h-3v-6zm5-2h3v8h-3V9z' },
   { label: '教室管理', to: '/admin/classrooms', icon: 'M4 6h16v12H4V6zm3 2v8h2V8H7zm4 0v8h2V8h-2z' },
   { label: '讲座管理', to: '/admin/lectures', icon: 'M4 6h16v8H4V6zm3-3h10v2H7V3zm-1 13h12v2H6v-2z' },
   { label: '讲座签到', to: '/admin/lectures/checkins', icon: 'M6 4h12v2H6V4zm-1 4h14v2H5V8zm1 4h10v2H6v-2z' },

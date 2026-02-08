@@ -46,6 +46,14 @@
         select count(1) from bus_booking where trip_id = #{tripId} and status = #{status}
     </select>
 
+    <select id="countAll" resultType="int">
+        select count(1) from bus_booking
+    </select>
+
+    <select id="countByStatus" resultType="int">
+        select count(1) from bus_booking where status = #{status}
+    </select>
+
     <select id="selectEarliestWaitlist" resultMap="BookingMap">
         select * from bus_booking
         where trip_id = #{tripId} and status = #{status}

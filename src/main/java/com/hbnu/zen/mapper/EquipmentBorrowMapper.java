@@ -34,6 +34,10 @@ public interface EquipmentBorrowMapper {
                      @Param("endTime") LocalDateTime endTime,
                      @Param("statuses") java.util.List<String> statuses);
 
+    int countAll();
+
+    int countByStatus(@Param("status") String status);
+
     List<EquipmentBorrowView> selectPendingViews(@Param("status") String status);
 
     List<EquipmentBorrowView> selectMyViews(@Param("userId") Long userId);

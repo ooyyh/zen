@@ -96,6 +96,12 @@ const router = createRouter({
       meta: { title: '我的校车', parent: '校车管理' }
     },
     {
+      path: '/admin/reports',
+      name: 'admin-reports',
+      component: () => import('../views/AdminReportView.vue'),
+      meta: { title: '运营报表', parent: '后台管理', admin: true }
+    },
+    {
       path: '/admin/classrooms',
       name: 'admin-classrooms',
       component: () => import('../views/AdminClassroomView.vue'),

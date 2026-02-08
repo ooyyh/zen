@@ -37,6 +37,10 @@
         select count(1) from lecture_signup where lecture_id = #{lectureId} and status = #{status}
     </select>
 
+    <select id="countAll" resultType="int">
+        select count(1) from lecture_signup
+    </select>
+
     <select id="selectEarliestWaitlist" resultMap="SignupMap">
         select * from lecture_signup
         where lecture_id = #{lectureId} and status = #{status}

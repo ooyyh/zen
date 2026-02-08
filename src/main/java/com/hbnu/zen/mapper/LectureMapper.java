@@ -15,4 +15,6 @@ public interface LectureMapper {
     Lecture selectById(@Param("id") Long id);
 
     List<Lecture> selectAll(@Param("status") String status);
+
+    int countAll();
 }

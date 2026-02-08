@@ -20,6 +20,8 @@ public interface LectureSignupMapper {
     int countByStatus(@Param("lectureId") Long lectureId,
                       @Param("status") String status);
 
+    int countAll();
+
     LectureSignup selectEarliestWaitlist(@Param("lectureId") Long lectureId,
                                          @Param("status") String status);
 

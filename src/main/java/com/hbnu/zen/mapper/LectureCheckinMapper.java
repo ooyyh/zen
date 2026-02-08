@@ -15,4 +15,6 @@ public interface LectureCheckinMapper {
                                           @Param("userId") Long userId);
 
     List<LectureCheckinView> selectViewsByLecture(@Param("lectureId") Long lectureId);
+
+    int countAll();
 }
