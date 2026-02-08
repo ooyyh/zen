@@ -20,3 +20,10 @@ VALUES
   ('EQUIPMENT_BORROW_REJECTED', '设备借用被驳回', '你的设备借用被驳回。设备：{equipment} 原因：{remark}'),
   ('EQUIPMENT_BORROW_RETURNED', '设备归还确认', '设备归还已确认。设备：{equipment}')
 ON DUPLICATE KEY UPDATE title = VALUES(title), content = VALUES(content);
+INSERT INTO message_template (template_code, title, content)
+VALUES
+  ('BUS_BOOKED', '校车预约成功', '你已成功预约校车：{route} 发车时间 {departureTime}'),
+  ('BUS_WAITLIST', '校车候补排队中', '你已进入校车候补队列：{route} 发车时间 {departureTime}'),
+  ('BUS_CANCELED', '校车预约已取消', '你的校车预约已取消：{route} 发车时间 {departureTime}'),
+  ('BUS_PROMOTED', '校车候补转正', '候补成功转正：{route} 发车时间 {departureTime}')
+ON DUPLICATE KEY UPDATE title = VALUES(title), content = VALUES(content);

@@ -6,6 +6,7 @@ public class DashboardSummary {
     private int pendingApprovalCount;
     private int unreadMessageCount;
     private int equipmentCount;
+    private int busTripCount;
 
     public int getClassroomCount() {
         return classroomCount;
@@ -45,5 +46,13 @@ public class DashboardSummary {
 
     public void setEquipmentCount(int equipmentCount) {
         this.equipmentCount = equipmentCount;
+    }
+
+    public int getBusTripCount() {
+        return busTripCount;
+    }
+
+    public void setBusTripCount(int busTripCount) {
+        this.busTripCount = busTripCount;
     }
 }

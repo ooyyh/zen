@@ -136,3 +136,39 @@ CREATE TABLE IF NOT EXISTS equipment_borrow (
   KEY idx_equipment_borrow_time (start_time, end_time),
   KEY idx_equipment_borrow_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+-- Bus module
+CREATE TABLE IF NOT EXISTS bus_route (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(128) NOT NULL,
+  origin VARCHAR(128) NOT NULL,
+  destination VARCHAR(128) NOT NULL,
+  status TINYINT NOT NULL DEFAULT 1,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS bus_trip (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  route_id BIGINT NOT NULL,
+  bus_no VARCHAR(64),
+  departure_time DATETIME NOT NULL,
+  arrival_time DATETIME NOT NULL,
+  capacity INT NOT NULL,
+  status VARCHAR(20) NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY idx_bus_trip_route (route_id),
+  KEY idx_bus_trip_time (departure_time)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS bus_booking (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  trip_id BIGINT NOT NULL,
+  user_id BIGINT NOT NULL,
+  status VARCHAR(20) NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY idx_bus_booking_trip (trip_id),
+  KEY idx_bus_booking_user (user_id),
+  KEY idx_bus_booking_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

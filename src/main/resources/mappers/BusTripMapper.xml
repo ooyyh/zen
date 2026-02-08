@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hbnu.zen.mapper.BusTripMapper">
+    <resultMap id="TripMap" type="com.hbnu.zen.mybatis.entity.BusTrip">
+        <id column="id" property="id" />
+        <result column="route_id" property="routeId" />
+        <result column="bus_no" property="busNo" />
+        <result column="departure_time" property="departureTime" />
+        <result column="arrival_time" property="arrivalTime" />
+        <result column="capacity" property="capacity" />
+        <result column="status" property="status" />
+        <result column="created_at" property="createdAt" />
+        <result column="updated_at" property="updatedAt" />
+    </resultMap>
+
+    <resultMap id="TripViewMap" type="com.hbnu.zen.dto.BusTripView">
+        <id column="id" property="id" />
+        <result column="route_id" property="routeId" />
+        <result column="route_name" property="routeName" />
+        <result column="origin" property="origin" />
+        <result column="destination" property="destination" />
+        <result column="bus_no" property="busNo" />
+        <result column="departure_time" property="departureTime" />
+        <result column="arrival_time" property="arrivalTime" />
+        <result column="capacity" property="capacity" />
+        <result column="remaining_seats" property="remainingSeats" />
+        <result column="status" property="status" />
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into bus_trip (route_id, bus_no, departure_time, arrival_time, capacity, status)
+        values (#{routeId}, #{busNo}, #{departureTime}, #{arrivalTime}, #{capacity}, #{status})
+    </insert>
+
+    <update id="update">
+        update bus_trip
+        set route_id = #{routeId},
+            bus_no = #{busNo},
+            departure_time = #{departureTime},
+            arrival_time = #{arrivalTime},
+            capacity = #{capacity},
+            status = #{status}
+        where id = #{id}
+    </update>
+
+    <select id="selectById" resultMap="TripMap">
+        select * from bus_trip where id = #{id}
+    </select>
+
+    <select id="selectAll" resultMap="TripMap">
+        select * from bus_trip
+        <if test="status != null and status != ''">
+            where status = #{status}
+        </if>
+        order by departure_time desc
+    </select>
+
+    <select id="selectViews" resultMap="TripViewMap">
+        select t.id,
+               t.route_id,
+               r.name as route_name,
+               r.origin,
+               r.destination,
+               t.bus_no,
+               t.departure_time,
+               t.arrival_time,
+               t.capacity,
+               (t.capacity - ifnull(b.booked_count, 0)) as remaining_seats,
+               t.status
+        from bus_trip t
+        join bus_route r on r.id = t.route_id
+        left join (
+            select trip_id, count(1) as booked_count
+            from bus_booking
+            where status = 'BOOKED'
+            group by trip_id
+        ) b on b.trip_id = t.id
+        <where>
+            <if test="status != null and status != ''">
+                t.status = #{status}
+            </if>
+        </where>
+        order by t.departure_time asc
+    </select>
+
+    <select id="countAll" resultType="int">
+        select count(1) from bus_trip
+    </select>
+</mapper>

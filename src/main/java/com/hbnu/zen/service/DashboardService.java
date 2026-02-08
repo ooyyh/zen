@@ -5,6 +5,7 @@ import com.hbnu.zen.common.Role;
 import com.hbnu.zen.dto.DashboardSummary;
 import com.hbnu.zen.mapper.ApprovalTaskMapper;
 import com.hbnu.zen.mapper.ClassroomMapper;
+import com.hbnu.zen.mapper.BusTripMapper;
 import com.hbnu.zen.mapper.EquipmentMapper;
 import com.hbnu.zen.mapper.MessageMapper;
 import com.hbnu.zen.mapper.ReservationMapper;
@@ -17,17 +18,20 @@ public class DashboardService {
     private final ApprovalTaskMapper approvalTaskMapper;
     private final MessageMapper messageMapper;
     private final EquipmentMapper equipmentMapper;
+    private final BusTripMapper busTripMapper;
 
     public DashboardService(ClassroomMapper classroomMapper,
                             ReservationMapper reservationMapper,
                             ApprovalTaskMapper approvalTaskMapper,
                             MessageMapper messageMapper,
-                            EquipmentMapper equipmentMapper) {
+                            EquipmentMapper equipmentMapper,
+                            BusTripMapper busTripMapper) {
         this.classroomMapper = classroomMapper;
         this.reservationMapper = reservationMapper;
         this.approvalTaskMapper = approvalTaskMapper;
         this.messageMapper = messageMapper;
         this.equipmentMapper = equipmentMapper;
+        this.busTripMapper = busTripMapper;
     }
 
     public DashboardSummary getSummary(Long userId) {
@@ -37,6 +41,7 @@ public class DashboardService {
         summary.setPendingApprovalCount(approvalTaskMapper.countPending(ApprovalStatus.PENDING, Role.ADMIN));
         summary.setUnreadMessageCount(messageMapper.countUnread(userId));
         summary.setEquipmentCount(equipmentMapper.countAll());
+        summary.setBusTripCount(busTripMapper.countAll());
         return summary;
     }
 }

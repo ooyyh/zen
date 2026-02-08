@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hbnu.zen.mapper.BusBookingMapper">
+    <resultMap id="BookingMap" type="com.hbnu.zen.mybatis.entity.BusBooking">
+        <id column="id" property="id" />
+        <result column="trip_id" property="tripId" />
+        <result column="user_id" property="userId" />
+        <result column="status" property="status" />
+        <result column="created_at" property="createdAt" />
+        <result column="updated_at" property="updatedAt" />
+    </resultMap>
+
+    <resultMap id="BookingViewMap" type="com.hbnu.zen.dto.BusBookingView">
+        <id column="id" property="id" />
+        <result column="trip_id" property="tripId" />
+        <result column="user_id" property="userId" />
+        <result column="username" property="username" />
+        <result column="route_name" property="routeName" />
+        <result column="origin" property="origin" />
+        <result column="destination" property="destination" />
+        <result column="bus_no" property="busNo" />
+        <result column="departure_time" property="departureTime" />
+        <result column="arrival_time" property="arrivalTime" />
+        <result column="status" property="status" />
+        <result column="created_at" property="createdAt" />
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into bus_booking (trip_id, user_id, status)
+        values (#{tripId}, #{userId}, #{status})
+    </insert>
+
+    <select id="selectById" resultMap="BookingMap">
+        select * from bus_booking where id = #{id}
+    </select>
+
+    <select id="selectByTripAndUser" resultMap="BookingMap">
+        select * from bus_booking where trip_id = #{tripId} and user_id = #{userId}
+    </select>
+
+    <update id="updateStatus">
+        update bus_booking set status = #{status} where id = #{id}
+    </update>
+
+    <select id="countBooked" resultType="int">
+        select count(1) from bus_booking where trip_id = #{tripId} and status = #{status}
+    </select>
+
+    <select id="selectEarliestWaitlist" resultMap="BookingMap">
+        select * from bus_booking
+        where trip_id = #{tripId} and status = #{status}
+        order by created_at asc
+        limit 1
+    </select>
+
+    <select id="selectMyViews" resultMap="BookingViewMap">
+        select b.id,
+               b.trip_id,
+               b.user_id,
+               u.username,
+               r.name as route_name,
+               r.origin,
+               r.destination,
+               t.bus_no,
+               t.departure_time,
+               t.arrival_time,
+               b.status,
+               b.created_at
+        from bus_booking b
+        join bus_trip t on t.id = b.trip_id
+        join bus_route r on r.id = t.route_id
+        join `user` u on u.id = b.user_id
+        where b.user_id = #{userId}
+        order by b.created_at desc
+    </select>
+
+    <select id="selectAllViews" resultMap="BookingViewMap">
+        select b.id,
+               b.trip_id,
+               b.user_id,
+               u.username,
+               r.name as route_name,
+               r.origin,
+               r.destination,
+               t.bus_no,
+               t.departure_time,
+               t.arrival_time,
+               b.status,
+               b.created_at
+        from bus_booking b
+        join bus_trip t on t.id = b.trip_id
+        join bus_route r on r.id = t.route_id
+        join `user` u on u.id = b.user_id
+        <if test="status != null and status != ''">
+            where b.status = #{status}
+        </if>
+        order by b.created_at desc
+    </select>
+</mapper>

@@ -8,7 +8,7 @@ spring:
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
   redis:
-    host: 127.0.0.1
+    host: 59.110.93.61
     port: 6379
   sql:
     init:
@@ -24,7 +24,7 @@ mybatis:
 
 app:
   jwt:
-    secret: "zen-campus-secret-change-me"
+    secret: "zen-project-jwt-secret-key-32-bytes!!"
     expire-minutes: 480
   reservation:
     lock-wait-ms: 800
@@ -33,5 +33,8 @@ app:
     lock-wait-ms: 800
     lock-lease-ms: 5000
   equipment:
+    lock-wait-ms: 800
+    lock-lease-ms: 5000
+  bus:
     lock-wait-ms: 800
     lock-lease-ms: 5000
