@@ -156,6 +156,12 @@ const router = createRouter({
       meta: { title: '用户管理', parent: '后台管理', admin: true }
     },
     {
+      path: '/admin/message-templates',
+      name: 'admin-message-templates',
+      component: () => import('../views/AdminMessageTemplateView.vue'),
+      meta: { title: '消息模板', parent: '后台管理', admin: true }
+    },
+    {
       path: '/admin/config',
       name: 'admin-config',
       component: () => import('../views/AdminConfigView.vue'),

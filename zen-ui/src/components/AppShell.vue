@@ -46,6 +46,7 @@ const adminItems = [
   { label: '校车班次', to: '/admin/bus/trips', icon: 'M5 6h14l1.5 4.5V16a2 2 0 0 1-2 2H17a2 2 0 0 1-2-2H9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-5.5L5 6zm1 5h12v3H6v-3z' },
   { label: '校车记录', to: '/admin/bus/bookings', icon: 'M6 4h12v2H6V4zm0 5h12v2H6V9zm0 5h12v2H6v-2z' },
   { label: '用户管理', to: '/admin/users', icon: 'M7 10a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm-2 8a5 5 0 0 1 10 0H5z' },
+  { label: '消息模板', to: '/admin/message-templates', icon: 'M4 4h16v12H4V4zm3 3h10v2H7V7zm0 4h7v2H7v-2z' },
   { label: '规则配置', to: '/admin/config', icon: 'M4 4h16v4H4V4zm0 6h16v10H4V10zm4 2h8v2H8v-2zm0 4h5v2H8v-2z' }
 ]
 </script>

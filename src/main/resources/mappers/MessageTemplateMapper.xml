@@ -13,4 +13,24 @@
     <select id="selectByCode" resultMap="TemplateMap">
         select * from message_template where template_code = #{templateCode}
     </select>
+
+    <select id="selectById" resultMap="TemplateMap">
+        select * from message_template where id = #{id}
+    </select>
+
+    <select id="selectAll" resultMap="TemplateMap">
+        select * from message_template order by updated_at desc
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into message_template (template_code, title, content)
+        values (#{templateCode}, #{title}, #{content})
+    </insert>
+
+    <update id="update">
+        update message_template
+        set title = #{title},
+            content = #{content}
+        where id = #{id}
+    </update>
 </mapper>
