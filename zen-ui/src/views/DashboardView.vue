@@ -8,7 +8,8 @@ const summary = ref({
   reservationCount: 0,
   pendingApprovalCount: 0,
   unreadMessageCount: 0,
-  equipmentCount: 0
+  equipmentCount: 0,
+  busTripCount: 0
 })
 const loading = ref(true)
 const error = ref('')
@@ -43,6 +44,11 @@ onMounted(load)
         <span class="subtle">资产与资源池</span>
       </div>
       <div class="card summary-card">
+        <p class="summary-label">校车班次</p>
+        <h2>{{ summary.busTripCount }}</h2>
+        <span class="subtle">当期可配置班次</span>
+      </div>
+      <div class="card summary-card">
         <p class="summary-label">预约总量</p>
         <h2>{{ summary.reservationCount }}</h2>
         <span class="subtle">含审批中与已通过</span>
@@ -67,11 +73,11 @@ onMounted(load)
       <div class="guide-grid">
         <div>
           <h4>学生/教师</h4>
-          <p class="subtle">进入“发起预约”或“设备借用”，提交后等待审批。</p>
+          <p class="subtle">进入“发起预约”、“设备借用”或“校车预约”，提交后等待审批。</p>
         </div>
         <div>
           <h4>管理员</h4>
-          <p class="subtle">在“审批处理”与“设备借用审批”中批量处理申请。</p>
+          <p class="subtle">在“审批处理”与“借用审批”中批量处理申请，维护班次与线路。</p>
         </div>
         <div>
           <h4>消息中心</h4>
@@ -89,7 +95,7 @@ onMounted(load)
 <style scoped>
 .summary-grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 16px;
 }
 
@@ -123,13 +129,17 @@ onMounted(load)
   color: #dc2626;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1280px) {
   .summary-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 900px) {
+  .summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .guide-grid {
     grid-template-columns: 1fr;
   }

@@ -84,6 +84,18 @@ const router = createRouter({
       meta: { title: '我的设备', parent: '设备管理' }
     },
     {
+      path: '/bus/trips',
+      name: 'bus-trips',
+      component: () => import('../views/BusTripListView.vue'),
+      meta: { title: '校车预约', parent: '校车管理' }
+    },
+    {
+      path: '/bus/bookings/my',
+      name: 'bus-bookings-my',
+      component: () => import('../views/BusBookingListView.vue'),
+      meta: { title: '我的校车', parent: '校车管理' }
+    },
+    {
       path: '/admin/classrooms',
       name: 'admin-classrooms',
       component: () => import('../views/AdminClassroomView.vue'),
@@ -100,6 +112,24 @@ const router = createRouter({
       name: 'admin-equipments-borrows',
       component: () => import('../views/AdminEquipmentBorrowView.vue'),
       meta: { title: '借用审批', parent: '后台管理', admin: true }
+    },
+    {
+      path: '/admin/bus/routes',
+      name: 'admin-bus-routes',
+      component: () => import('../views/AdminBusRouteView.vue'),
+      meta: { title: '线路管理', parent: '后台管理', admin: true }
+    },
+    {
+      path: '/admin/bus/trips',
+      name: 'admin-bus-trips',
+      component: () => import('../views/AdminBusTripView.vue'),
+      meta: { title: '班次管理', parent: '后台管理', admin: true }
+    },
+    {
+      path: '/admin/bus/bookings',
+      name: 'admin-bus-bookings',
+      component: () => import('../views/AdminBusBookingView.vue'),
+      meta: { title: '校车预约记录', parent: '后台管理', admin: true }
     },
     {
       path: '/admin/lectures',
