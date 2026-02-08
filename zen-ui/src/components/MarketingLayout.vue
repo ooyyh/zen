@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { RouterLink, useRouter } from 'vue-router'
 import { clearAuth, getUser } from '@/services/auth'
 

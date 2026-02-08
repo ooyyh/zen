@@ -1,4 +1,4 @@
-﻿const TOKEN_KEY = 'zen_token'
+const TOKEN_KEY = 'zen_token'
 const USER_KEY = 'zen_user'
 
 export const getToken = () => localStorage.getItem(TOKEN_KEY)

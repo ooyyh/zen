@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { request } from '@/services/api'

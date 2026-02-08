@@ -4,68 +4,76 @@ import AppShell from '@/components/AppShell.vue'
 import { request } from '@/services/api'
 
 const list = ref([])
-const loading = ref(false)
 const error = ref('')
 const message = ref('')
 const editingId = ref(null)
 
 const form = ref({
-  building: '',
-  roomNo: '',
-  capacity: '',
+  title: '',
+  speaker: '',
   location: '',
-  equipmentJson: '',
-  status: 1
+  startTime: '',
+  endTime: '',
+  capacity: 50,
+  status: 'DRAFT'
 })
 
+const normalizeDateTime = (value) => {
+  if (!value) return ''
+  return `${value}:00`
+}
+
 const load = async () => {
-  loading.value = true
   error.value = ''
   try {
-    list.value = await request('/api/classrooms')
+    list.value = await request('/api/admin/lectures')
   } catch (e) {
     error.value = e.message || '加载失败'
-  } finally {
-    loading.value = false
   }
 }
 
 const resetForm = () => {
   editingId.value = null
   form.value = {
-    building: '',
-    roomNo: '',
-    capacity: '',
+    title: '',
+    speaker: '',
     location: '',
-    equipmentJson: '',
-    status: 1
+    startTime: '',
+    endTime: '',
+    capacity: 50,
+    status: 'DRAFT'
   }
 }
 
 const submit = async () => {
-  message.value = ''
   error.value = ''
-  if (!form.value.building || !form.value.roomNo || !form.value.capacity) {
+  message.value = ''
+  if (!form.value.title || !form.value.startTime || !form.value.endTime) {
     error.value = '请完整填写必填信息'
     return
   }
   const payload = {
-    ...form.value,
-    capacity: Number(form.value.capacity)
+    title: form.value.title,
+    speaker: form.value.speaker,
+    location: form.value.location,
+    startTime: normalizeDateTime(form.value.startTime),
+    endTime: normalizeDateTime(form.value.endTime),
+    capacity: Number(form.value.capacity),
+    status: form.value.status
   }
   try {
     if (editingId.value) {
-      await request(`/api/admin/classrooms/${editingId.value}`, {
+      await request(`/api/admin/lectures/${editingId.value}`, {
         method: 'PUT',
         body: JSON.stringify(payload)
       })
-      message.value = '教室已更新'
+      message.value = '讲座已更新'
     } else {
-      await request('/api/admin/classrooms', {
+      await request('/api/admin/lectures', {
         method: 'POST',
         body: JSON.stringify(payload)
       })
-      message.value = '教室已创建'
+      message.value = '讲座已创建'
     }
     resetForm()
     await load()
@@ -77,11 +85,12 @@ const submit = async () => {
 const edit = (item) => {
   editingId.value = item.id
   form.value = {
-    building: item.building,
-    roomNo: item.roomNo,
-    capacity: item.capacity,
+    title: item.title,
+    speaker: item.speaker || '',
     location: item.location || '',
-    equipmentJson: item.equipmentJson || '',
+    startTime: item.startTime ? item.startTime.slice(0, 16) : '',
+    endTime: item.endTime ? item.endTime.slice(0, 16) : '',
+    capacity: item.capacity,
     status: item.status
   }
 }
@@ -90,38 +99,43 @@ onMounted(load)
 </script>
 
 <template>
-  <AppShell title="教室管理">
+  <AppShell title="讲座管理">
     <div class="card form-card">
       <div class="section-title">
-        <h2>{{ editingId ? '编辑教室' : '新增教室' }}</h2>
-        <span>可配置容量、位置与设备</span>
+        <h2>{{ editingId ? '编辑讲座' : '新增讲座' }}</h2>
+        <span>发布前设置为 OPEN</span>
       </div>
       <form class="form-grid" @submit.prevent="submit">
         <label class="field">
-          楼栋（必填）
-          <input v-model="form.building" class="input" placeholder="例如 A 区" />
+          讲座标题（必填）
+          <input v-model="form.title" class="input" placeholder="如 人工智能伦理与治理" />
         </label>
         <label class="field">
-          教室号（必填）
-          <input v-model="form.roomNo" class="input" placeholder="例如 101" />
+          讲者
+          <input v-model="form.speaker" class="input" />
         </label>
         <label class="field">
-          容量（必填）
-          <input v-model="form.capacity" class="input" type="number" placeholder="例如 60" />
+          地点
+          <input v-model="form.location" class="input" />
         </label>
         <label class="field">
-          位置描述
-          <input v-model="form.location" class="input" placeholder="如 理科楼 2F" />
+          开始时间（必填）
+          <input v-model="form.startTime" class="input" type="datetime-local" />
         </label>
         <label class="field">
-          设备配置
-          <input v-model="form.equipmentJson" class="input" placeholder="如 投影/录播/音响" />
+          结束时间（必填）
+          <input v-model="form.endTime" class="input" type="datetime-local" />
+        </label>
+        <label class="field">
+          容量
+          <input v-model="form.capacity" class="input" type="number" />
         </label>
         <label class="field">
           状态
           <select v-model="form.status" class="select">
-            <option :value="1">可用</option>
-            <option :value="0">停用</option>
+            <option value="DRAFT">草稿</option>
+            <option value="OPEN">开放报名</option>
+            <option value="CLOSED">已关闭</option>
           </select>
         </label>
         <p v-if="error" class="error">{{ error }}</p>
@@ -137,30 +151,28 @@ onMounted(load)
       <table class="table">
         <thead>
           <tr>
-            <th>楼栋</th>
-            <th>教室号</th>
+            <th>标题</th>
+            <th>时间</th>
+            <th>地点</th>
             <th>容量</th>
-            <th>位置</th>
-            <th>设备</th>
             <th>状态</th>
             <th>操作</th>
           </tr>
         </thead>
         <tbody v-if="list.length">
           <tr v-for="item in list" :key="item.id">
-            <td>{{ item.building }}</td>
-            <td>{{ item.roomNo }}</td>
-            <td>{{ item.capacity }}</td>
+            <td>{{ item.title }}</td>
+            <td>{{ item.startTime }} - {{ item.endTime }}</td>
             <td>{{ item.location || '-' }}</td>
-            <td>{{ item.equipmentJson || '-' }}</td>
-            <td>{{ item.status === 1 ? '可用' : '停用' }}</td>
+            <td>{{ item.capacity }}</td>
+            <td>{{ item.status }}</td>
             <td>
               <button class="btn ghost" @click="edit(item)">编辑</button>
             </td>
           </tr>
         </tbody>
       </table>
-      <div v-if="!list.length && !loading" class="empty">暂无教室数据</div>
+      <div v-if="!list.length" class="empty">暂无讲座数据</div>
     </div>
   </AppShell>
 </template>

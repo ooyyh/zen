@@ -11,7 +11,7 @@ const load = async () => {
   loading.value = true
   error.value = ''
   try {
-    list.value = await request('/api/reservations/my')
+    list.value = await request('/api/lectures/my/signups')
   } catch (e) {
     error.value = e.message || '加载失败'
   } finally {
@@ -19,10 +19,10 @@ const load = async () => {
   }
 }
 
-const cancel = async (id) => {
-  if (!confirm('确认取消该预约？')) return
+const cancel = async (lectureId) => {
+  if (!confirm('确认取消报名？')) return
   try {
-    await request(`/api/reservations/${id}/cancel`, { method: 'POST' })
+    await request(`/api/lectures/${lectureId}/cancel`, { method: 'POST' })
     await load()
   } catch (e) {
     alert(e.message || '取消失败')
@@ -31,12 +31,10 @@ const cancel = async (id) => {
 
 const statusText = (status) => {
   switch (status) {
-    case 'PENDING_APPROVAL':
-      return '审批中'
-    case 'APPROVED':
-      return '已通过'
-    case 'REJECTED':
-      return '已驳回'
+    case 'SIGNED_UP':
+      return '已报名'
+    case 'WAITLIST':
+      return '候补中'
     case 'CANCELED':
       return '已取消'
     default:
@@ -48,34 +46,34 @@ onMounted(load)
 </script>
 
 <template>
-  <AppShell title="我的预约">
+  <AppShell title="我的讲座">
     <div v-if="error" class="card error-card">{{ error }}</div>
     <div class="card table-card">
       <table class="table">
         <thead>
           <tr>
-            <th>预约时间</th>
-            <th>教室ID</th>
+            <th>讲座</th>
+            <th>时间</th>
+            <th>地点</th>
             <th>状态</th>
-            <th>说明</th>
             <th>操作</th>
           </tr>
         </thead>
         <tbody v-if="list.length">
           <tr v-for="item in list" :key="item.id">
+            <td>{{ item.title }}</td>
             <td>{{ item.startTime }} - {{ item.endTime }}</td>
-            <td>{{ item.classroomId }}</td>
+            <td>{{ item.location || '-' }}</td>
             <td><span class="tag">{{ statusText(item.status) }}</span></td>
-            <td>{{ item.reason || '-' }}</td>
             <td>
-              <button class="btn ghost" @click="cancel(item.id)" :disabled="item.status === 'CANCELED'">
+              <button class="btn ghost" @click="cancel(item.lectureId)" :disabled="item.status === 'CANCELED'">
                 取消
               </button>
             </td>
           </tr>
         </tbody>
       </table>
-      <div v-if="!list.length && !loading" class="empty">暂无预约记录</div>
+      <div v-if="!list.length && !loading" class="empty">暂无报名记录</div>
     </div>
   </AppShell>
 </template>

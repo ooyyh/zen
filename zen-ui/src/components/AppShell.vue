@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { computed } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { clearAuth, getUser, isAdmin } from '@/services/auth'
@@ -25,12 +25,15 @@ const navItems = [
   { label: '教室资源', to: '/classrooms', icon: 'M4 5h16v5H4V5zm0 7h10v7H4v-7zm12 0h4v7h-4v-7z' },
   { label: '发起预约', to: '/reservations/new', icon: 'M5 4h14v2H5V4zm0 4h14v12H5V8zm4 3h6v2H9v-2zm0 4h6v2H9v-2z' },
   { label: '我的预约', to: '/reservations/my', icon: 'M6 4h12v4H6V4zm0 6h12v10H6V10z' },
+  { label: '讲座报名', to: '/lectures', icon: 'M4 6h16v8H4V6zm3-3h10v2H7V3zm-1 13h12v2H6v-2z' },
+  { label: '我的讲座', to: '/lectures/my', icon: 'M6 4h12v4H6V4zm0 6h12v10H6V10z' },
   { label: '通知中心', to: '/messages', icon: 'M12 4a5 5 0 0 1 5 5v4l2 2H5l2-2V9a5 5 0 0 1 5-5z' }
 ]
 
 const adminItems = [
   { label: '审批处理', to: '/approvals', icon: 'M6 4h12v2H6V4zm0 5h12v2H6V9zm0 5h12v2H6v-2z' },
   { label: '教室管理', to: '/admin/classrooms', icon: 'M4 6h16v12H4V6zm3 2v8h2V8H7zm4 0v8h2V8h-2z' },
+  { label: '讲座管理', to: '/admin/lectures', icon: 'M4 6h16v8H4V6zm3-3h10v2H7V3zm-1 13h12v2H6v-2z' },
   { label: '用户管理', to: '/admin/users', icon: 'M7 10a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm-2 8a5 5 0 0 1 10 0H5z' },
   { label: '规则配置', to: '/admin/config', icon: 'M4 4h16v4H4V4zm0 6h16v10H4V10zm4 2h8v2H8v-2zm0 4h5v2H8v-2z' }
 ]

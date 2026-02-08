@@ -54,6 +54,18 @@ const router = createRouter({
       meta: { title: '审批处理', parent: '后台管理', admin: true }
     },
     {
+      path: '/lectures',
+      name: 'lectures',
+      component: () => import('../views/LectureListView.vue'),
+      meta: { title: '讲座报名', parent: '讲座管理' }
+    },
+    {
+      path: '/lectures/my',
+      name: 'lecture-my',
+      component: () => import('../views/LectureSignupListView.vue'),
+      meta: { title: '我的讲座', parent: '讲座管理' }
+    },
+    {
       path: '/messages',
       name: 'messages',
       component: () => import('../views/MessageListView.vue'),
@@ -64,6 +76,12 @@ const router = createRouter({
       name: 'admin-classrooms',
       component: () => import('../views/AdminClassroomView.vue'),
       meta: { title: '教室管理', parent: '后台管理', admin: true }
+    },
+    {
+      path: '/admin/lectures',
+      name: 'admin-lectures',
+      component: () => import('../views/AdminLectureView.vue'),
+      meta: { title: '讲座管理', parent: '后台管理', admin: true }
     },
     {
       path: '/admin/users',

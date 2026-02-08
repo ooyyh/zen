@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { onMounted, ref } from 'vue'
 import AppShell from '@/components/AppShell.vue'
 import { request } from '@/services/api'
