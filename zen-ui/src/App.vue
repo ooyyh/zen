@@ -1,119 +1,223 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from '@/components/HelloWorld.vue'
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="container topbar-inner">
+        <div class="brand">
+          <div class="brand-mark">
+            <span class="brand-dot"></span>
+          </div>
+          <div>
+            <p class="brand-title">Zen Campus</p>
+            <p class="brand-sub">校园综合服务平台</p>
+          </div>
+        </div>
 
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+        <nav class="nav">
+          <RouterLink to="/">服务首页</RouterLink>
+          <RouterLink to="/about">平台介绍</RouterLink>
+          <a href="#services">服务入口</a>
+          <a href="#lectures">讲座活动</a>
+        </nav>
 
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
-    </div>
-  </header>
+        <div class="topbar-actions">
+          <button class="btn ghost">教师/学生登录</button>
+          <button class="btn primary">统一身份认证</button>
+        </div>
+      </div>
+    </header>
 
-  <RouterView />
+    <main>
+      <RouterView />
+    </main>
+
+    <footer class="footer">
+      <div class="container footer-inner">
+        <div>
+          <p class="footer-title">Zen Campus · 校园综合服务系统</p>
+          <p class="subtle">预约、审批、通知一体化，面向师生与管理部门。</p>
+        </div>
+        <div class="footer-meta">
+          <span>服务时间 07:00-23:00</span>
+          <span>运维热线 027-8888-6677</span>
+          <span>系统版本 v0.9.2</span>
+        </div>
+      </div>
+    </footer>
+  </div>
 </template>
 
 <style>
 @import '@/assets/base.css';
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-
-  font-weight: normal;
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
-header {
-  line-height: 1.5;
-  max-height: 100vh;
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  backdrop-filter: blur(16px);
+  background: rgba(245, 247, 251, 0.88);
+  border-bottom: 1px solid var(--border);
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
+.topbar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 16px 0;
 }
 
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
+.brand-mark {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #1d4ed8, #0ea5e9);
+  display: grid;
+  place-items: center;
+  box-shadow: var(--shadow-sm);
 }
 
-nav {
-  width: 100%;
+.brand-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #f8fafc;
+  box-shadow: inset 0 0 0 3px rgba(15, 23, 42, 0.08);
+}
+
+.brand-title {
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.brand-sub {
   font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
+  color: var(--text-muted);
 }
 
-nav a.router-link-exact-active {
-  color: var(--color-text);
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  font-size: 14px;
+  color: var(--text-muted);
 }
 
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
+.nav a {
+  padding: 6px 10px;
+  border-radius: 999px;
+  transition: color 0.2s ease, background-color 0.2s ease;
 }
 
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
+.nav a.router-link-exact-active,
+.nav a:hover {
+  color: var(--primary);
+  background: rgba(29, 78, 216, 0.1);
 }
 
-nav a:first-of-type {
-  border: 0;
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
+.btn {
+  border: 1px solid var(--border);
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
 
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
+.btn:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-sm);
+}
 
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
+.btn.primary {
+  background: var(--primary);
+  color: #fff;
+  border-color: transparent;
+}
 
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
+.btn.primary:hover {
+  background: var(--primary-strong);
+}
+
+.btn.ghost {
+  color: var(--text-muted);
+}
+
+.footer {
+  margin-top: auto;
+  border-top: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 28px 0 36px;
+  font-size: 14px;
+}
+
+.footer-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.footer-meta {
+  display: flex;
+  gap: 16px;
+  color: var(--text-muted);
+}
+
+@media (max-width: 960px) {
+  .topbar-inner {
     flex-wrap: wrap;
   }
 
-  .logo {
-    margin: 0 2rem 0 0;
+  .nav {
+    order: 3;
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
   }
 
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
+  .footer-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 
-    padding: 1rem 0;
-    margin-top: 1rem;
+  .footer-meta {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 720px) {
+  .topbar-actions {
+    width: 100%;
+    justify-content: flex-start;
   }
 }
 </style>
