@@ -1,4 +1,4 @@
-﻿package com.hbnu.zen.common;
+package com.hbnu.zen.common;
 
 public class ApiResponse<T> {
     private int code;
