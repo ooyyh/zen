@@ -5,6 +5,7 @@ import com.hbnu.zen.common.Role;
 import com.hbnu.zen.dto.DashboardSummary;
 import com.hbnu.zen.mapper.ApprovalTaskMapper;
 import com.hbnu.zen.mapper.ClassroomMapper;
+import com.hbnu.zen.mapper.EquipmentMapper;
 import com.hbnu.zen.mapper.MessageMapper;
 import com.hbnu.zen.mapper.ReservationMapper;
 import org.springframework.stereotype.Service;
@@ -15,15 +16,18 @@ public class DashboardService {
     private final ReservationMapper reservationMapper;
     private final ApprovalTaskMapper approvalTaskMapper;
     private final MessageMapper messageMapper;
+    private final EquipmentMapper equipmentMapper;
 
     public DashboardService(ClassroomMapper classroomMapper,
                             ReservationMapper reservationMapper,
                             ApprovalTaskMapper approvalTaskMapper,
-                            MessageMapper messageMapper) {
+                            MessageMapper messageMapper,
+                            EquipmentMapper equipmentMapper) {
         this.classroomMapper = classroomMapper;
         this.reservationMapper = reservationMapper;
         this.approvalTaskMapper = approvalTaskMapper;
         this.messageMapper = messageMapper;
+        this.equipmentMapper = equipmentMapper;
     }
 
     public DashboardSummary getSummary(Long userId) {
@@ -32,6 +36,7 @@ public class DashboardService {
         summary.setReservationCount(reservationMapper.countAll());
         summary.setPendingApprovalCount(approvalTaskMapper.countPending(ApprovalStatus.PENDING, Role.ADMIN));
         summary.setUnreadMessageCount(messageMapper.countUnread(userId));
+        summary.setEquipmentCount(equipmentMapper.countAll());
         return summary;
     }
 }

@@ -103,3 +103,36 @@ CREATE TABLE IF NOT EXISTS lecture_signup (
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   UNIQUE KEY uk_lecture_user (lecture_id, user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+-- Equipment module
+CREATE TABLE IF NOT EXISTS equipment (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(128) NOT NULL,
+  category VARCHAR(64),
+  asset_no VARCHAR(64),
+  location VARCHAR(128),
+  total_qty INT NOT NULL,
+  status TINYINT NOT NULL DEFAULT 1,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_equipment_asset (asset_no)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS equipment_borrow (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  equipment_id BIGINT NOT NULL,
+  user_id BIGINT NOT NULL,
+  start_time DATETIME NOT NULL,
+  end_time DATETIME NOT NULL,
+  status VARCHAR(20) NOT NULL,
+  reason VARCHAR(255),
+  approved_by BIGINT,
+  approved_at DATETIME,
+  remark VARCHAR(255),
+  returned_at DATETIME,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY idx_equipment_borrow_equipment (equipment_id),
+  KEY idx_equipment_borrow_user (user_id),
+  KEY idx_equipment_borrow_time (start_time, end_time),
+  KEY idx_equipment_borrow_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

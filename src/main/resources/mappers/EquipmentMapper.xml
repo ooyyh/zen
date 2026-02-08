@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hbnu.zen.mapper.EquipmentMapper">
+    <resultMap id="EquipmentMap" type="com.hbnu.zen.mybatis.entity.Equipment">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="category" property="category" />
+        <result column="asset_no" property="assetNo" />
+        <result column="location" property="location" />
+        <result column="total_qty" property="totalQty" />
+        <result column="status" property="status" />
+        <result column="created_at" property="createdAt" />
+        <result column="updated_at" property="updatedAt" />
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into equipment (name, category, asset_no, location, total_qty, status)
+        values (#{name}, #{category}, #{assetNo}, #{location}, #{totalQty}, #{status})
+    </insert>
+
+    <update id="update">
+        update equipment
+        set name = #{name},
+            category = #{category},
+            asset_no = #{assetNo},
+            location = #{location},
+            total_qty = #{totalQty},
+            status = #{status}
+        where id = #{id}
+    </update>
+
+    <select id="selectById" resultMap="EquipmentMap">
+        select * from equipment where id = #{id}
+    </select>
+
+    <select id="selectAll" resultMap="EquipmentMap">
+        select * from equipment
+        <where>
+            <if test="category != null and category != ''">
+                and category = #{category}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                and (name like concat('%', #{keyword}, '%') or asset_no like concat('%', #{keyword}, '%'))
+            </if>
+            <if test="availableOnly != null and availableOnly">
+                and status = 1
+            </if>
+        </where>
+        order by created_at desc
+    </select>
+
+    <select id="countAll" resultType="int">
+        select count(1) from equipment
+    </select>
+</mapper>

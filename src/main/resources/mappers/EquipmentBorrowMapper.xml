@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hbnu.zen.mapper.EquipmentBorrowMapper">
+    <resultMap id="BorrowMap" type="com.hbnu.zen.mybatis.entity.EquipmentBorrow">
+        <id column="id" property="id" />
+        <result column="equipment_id" property="equipmentId" />
+        <result column="user_id" property="userId" />
+        <result column="start_time" property="startTime" />
+        <result column="end_time" property="endTime" />
+        <result column="status" property="status" />
+        <result column="reason" property="reason" />
+        <result column="approved_by" property="approvedBy" />
+        <result column="approved_at" property="approvedAt" />
+        <result column="remark" property="remark" />
+        <result column="returned_at" property="returnedAt" />
+        <result column="created_at" property="createdAt" />
+        <result column="updated_at" property="updatedAt" />
+    </resultMap>
+
+    <resultMap id="BorrowViewMap" type="com.hbnu.zen.dto.EquipmentBorrowView">
+        <id column="id" property="id" />
+        <result column="equipment_id" property="equipmentId" />
+        <result column="user_id" property="userId" />
+        <result column="username" property="username" />
+        <result column="name" property="equipmentName" />
+        <result column="category" property="category" />
+        <result column="asset_no" property="assetNo" />
+        <result column="start_time" property="startTime" />
+        <result column="end_time" property="endTime" />
+        <result column="status" property="status" />
+        <result column="reason" property="reason" />
+        <result column="created_at" property="createdAt" />
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into equipment_borrow (equipment_id, user_id, start_time, end_time, status, reason)
+        values (#{equipmentId}, #{userId}, #{startTime}, #{endTime}, #{status}, #{reason})
+    </insert>
+
+    <select id="selectById" resultMap="BorrowMap">
+        select * from equipment_borrow where id = #{id}
+    </select>
+
+    <select id="selectByUserId" resultMap="BorrowMap">
+        select * from equipment_borrow where user_id = #{userId} order by created_at desc
+    </select>
+
+    <update id="updateStatus">
+        update equipment_borrow set status = #{status} where id = #{id}
+    </update>
+
+    <update id="updateDecision">
+        update equipment_borrow
+        set status = #{status},
+            approved_by = #{approvedBy},
+            approved_at = #{approvedAt},
+            remark = #{remark}
+        where id = #{id}
+    </update>
+
+    <update id="updateReturn">
+        update equipment_borrow
+        set status = #{status},
+            returned_at = #{returnedAt}
+        where id = #{id}
+    </update>
+
+    <select id="countOverlap" resultType="int">
+        select count(1) from equipment_borrow
+        where equipment_id = #{equipmentId}
+          and status in
+          <foreach collection="statuses" item="s" open="(" separator="," close=")">
+              #{s}
+          </foreach>
+          and start_time &lt; #{endTime}
+          and end_time &gt; #{startTime}
+    </select>
+
+    <select id="selectPendingViews" resultMap="BorrowViewMap">
+        select b.id,
+               b.equipment_id,
+               b.user_id,
+               u.username,
+               e.name,
+               e.category,
+               e.asset_no,
+               b.start_time,
+               b.end_time,
+               b.status,
+               b.reason,
+               b.created_at
+        from equipment_borrow b
+        join equipment e on e.id = b.equipment_id
+        join `user` u on u.id = b.user_id
+        where b.status = #{status}
+        order by b.created_at desc
+    </select>
+
+    <select id="selectMyViews" resultMap="BorrowViewMap">
+        select b.id,
+               b.equipment_id,
+               b.user_id,
+               u.username,
+               e.name,
+               e.category,
+               e.asset_no,
+               b.start_time,
+               b.end_time,
+               b.status,
+               b.reason,
+               b.created_at
+        from equipment_borrow b
+        join equipment e on e.id = b.equipment_id
+        join `user` u on u.id = b.user_id
+        where b.user_id = #{userId}
+        order by b.created_at desc
+    </select>
+</mapper>

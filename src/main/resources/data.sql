@@ -13,3 +13,10 @@ VALUES
   ('LECTURE_SIGNUP_SUCCESS', '讲座报名成功', '你已报名讲座：{lectureTitle}，时间：{startTime}'),
   ('LECTURE_WAITLIST', '讲座候补提醒', '你已进入讲座候补队列：{lectureTitle}')
 ON DUPLICATE KEY UPDATE title = VALUES(title), content = VALUES(content);
+INSERT INTO message_template (template_code, title, content)
+VALUES
+  ('EQUIPMENT_BORROW_CREATED', '设备借用已提交', '你的设备借用申请已提交，等待审批。设备：{equipment} {startTime}-{endTime}'),
+  ('EQUIPMENT_BORROW_APPROVED', '设备借用已通过', '你的设备借用已通过审批。设备：{equipment} {startTime}-{endTime}'),
+  ('EQUIPMENT_BORROW_REJECTED', '设备借用被驳回', '你的设备借用被驳回。设备：{equipment} 原因：{remark}'),
+  ('EQUIPMENT_BORROW_RETURNED', '设备归还确认', '设备归还已确认。设备：{equipment}')
+ON DUPLICATE KEY UPDATE title = VALUES(title), content = VALUES(content);

@@ -5,6 +5,7 @@ public class DashboardSummary {
     private int reservationCount;
     private int pendingApprovalCount;
     private int unreadMessageCount;
+    private int equipmentCount;
 
     public int getClassroomCount() {
         return classroomCount;
@@ -36,5 +37,13 @@ public class DashboardSummary {
 
     public void setUnreadMessageCount(int unreadMessageCount) {
         this.unreadMessageCount = unreadMessageCount;
+    }
+
+    public int getEquipmentCount() {
+        return equipmentCount;
+    }
+
+    public void setEquipmentCount(int equipmentCount) {
+        this.equipmentCount = equipmentCount;
     }
 }

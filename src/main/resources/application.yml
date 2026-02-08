@@ -32,3 +32,6 @@ app:
   lecture:
     lock-wait-ms: 800
     lock-lease-ms: 5000
+  equipment:
+    lock-wait-ms: 800
+    lock-lease-ms: 5000
