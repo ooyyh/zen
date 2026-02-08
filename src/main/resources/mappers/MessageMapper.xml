@@ -17,6 +17,10 @@
         values (#{userId}, #{templateCode}, #{title}, #{content}, #{status})
     </insert>
 
+    <select id="selectById" resultMap="MessageMap">
+        select * from message where id = #{id}
+    </select>
+
     <select id="selectByUser" resultMap="MessageMap">
         select * from message where user_id = #{userId} order by created_at desc
     </select>

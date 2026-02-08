@@ -42,7 +42,14 @@ public class MessageService {
         return messageMapper.selectByUser(userId);
     }
 
-    public void markRead(Long messageId) {
+    public void markRead(Long messageId, Long userId) {
+        Message message = messageMapper.selectById(messageId);
+        if (message == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND, "消息不存在");
+        }
+        if (!message.getUserId().equals(userId)) {
+            throw new BusinessException(ErrorCode.FORBIDDEN, "无权限操作该消息");
+        }
         messageMapper.markRead(messageId, LocalDateTime.now());
     }
 

@@ -28,7 +28,7 @@ public class MessageController {
 
     @PostMapping("/{id}/read")
     public ApiResponse<Void> markRead(@PathVariable Long id) {
-        messageService.markRead(id);
+        messageService.markRead(id, AuthUtil.getUserId());
         return ApiResponse.success();
     }
 }

@@ -10,6 +10,8 @@ import java.util.List;
 public interface MessageMapper {
     int insert(Message message);
 
+    Message selectById(@Param("id") Long id);
+
     List<Message> selectByUser(@Param("userId") Long userId);
 
     int markRead(@Param("id") Long id,
