@@ -1,5 +1,10 @@
+<script setup>
+import MarketingLayout from '@/components/MarketingLayout.vue'
+</script>
+
 <template>
-  <div class="about container">
+  <MarketingLayout>
+    <div class="about container">
     <div class="about-hero card">
       <div>
         <p class="pill">平台介绍</p>
@@ -45,7 +50,8 @@
         </ul>
       </div>
     </div>
-  </div>
+    </div>
+  </MarketingLayout>
 </template>
 
 <style scoped>

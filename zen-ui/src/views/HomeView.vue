@@ -1,4 +1,6 @@
 <script setup>
+import { RouterLink } from 'vue-router'
+import MarketingLayout from '@/components/MarketingLayout.vue'
 const services = [
   {
     title: '教室预约',
@@ -80,7 +82,8 @@ const highlights = [
 </script>
 
 <template>
-  <div class="page">
+  <MarketingLayout>
+    <div class="page">
     <section class="hero container">
       <div class="hero-copy">
         <span class="pill">综合服务平台 · 2026 春季版</span>
@@ -89,8 +92,8 @@ const highlights = [
           从教室、讲座到设备与校车，统一入口、统一审核、统一消息，解决“多系统、多规则、多等待”。
         </p>
         <div class="hero-actions">
-          <button class="btn primary">立即预约</button>
-          <button class="btn ghost">查看审批流</button>
+          <RouterLink class="btn primary" to="/dashboard">进入预约</RouterLink>
+          <RouterLink class="btn ghost" to="/approvals">查看审批流</RouterLink>
         </div>
         <div class="hero-metrics">
           <div>
@@ -279,7 +282,8 @@ const highlights = [
         <button class="btn ghost full">进入消息中心</button>
       </div>
     </section>
-  </div>
+    </div>
+  </MarketingLayout>
 </template>
 
 <style scoped>
