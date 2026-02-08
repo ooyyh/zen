@@ -51,4 +51,13 @@ public class ReservationController {
         reservationService.cancelReservation(id, AuthUtil.getUserId(), admin);
         return ApiResponse.success();
     }
+
+    @GetMapping("/{id}/timeline")
+    public ApiResponse<java.util.List<com.hbnu.zen.dto.ApprovalTimelineStep>> timeline(@PathVariable Long id) {
+        Reservation reservation = reservationService.getById(id);
+        if (!Role.ADMIN.equals(AuthUtil.getRole()) && !reservation.getUserId().equals(AuthUtil.getUserId())) {
+            throw new com.hbnu.zen.common.BusinessException(403, "无权限查看该流程");
+        }
+        return ApiResponse.success(reservationService.getTimeline(id));
+    }
 }

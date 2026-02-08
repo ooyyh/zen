@@ -4,6 +4,7 @@ import com.hbnu.zen.common.ApiResponse;
 import com.hbnu.zen.common.AuthUtil;
 import com.hbnu.zen.common.Role;
 import com.hbnu.zen.dto.LectureCreateRequest;
+import com.hbnu.zen.dto.LectureCheckinView;
 import com.hbnu.zen.mybatis.entity.Lecture;
 import com.hbnu.zen.service.LectureService;
 import org.springframework.validation.annotation.Validated;
@@ -44,5 +45,11 @@ public class AdminLectureController {
                                        @Validated @RequestBody LectureCreateRequest request) {
         AuthUtil.requireRole(Role.ADMIN);
         return ApiResponse.success(lectureService.updateLecture(id, request));
+    }
+
+    @GetMapping("/{id}/checkins")
+    public ApiResponse<List<LectureCheckinView>> checkins(@PathVariable Long id) {
+        AuthUtil.requireRole(Role.ADMIN);
+        return ApiResponse.success(lectureService.listCheckins(id));
     }
 }

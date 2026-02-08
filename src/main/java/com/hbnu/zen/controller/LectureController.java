@@ -45,6 +45,12 @@ public class LectureController {
         return ApiResponse.success();
     }
 
+    @PostMapping("/{id}/checkin")
+    public ApiResponse<Void> checkin(@PathVariable Long id) {
+        lectureService.checkIn(id, AuthUtil.getUserId());
+        return ApiResponse.success();
+    }
+
     @GetMapping("/my/signups")
     public ApiResponse<List<LectureSignupView>> mySignups() {
         return ApiResponse.success(lectureService.listMySignups(AuthUtil.getUserId()));

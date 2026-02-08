@@ -235,6 +235,52 @@ public class ReservationService {
         messageService.sendTemplate(reservation.getUserId(), "RESERVATION_REJECTED", params);
     }
 
+    public List<com.hbnu.zen.dto.ApprovalTimelineStep> getTimeline(Long reservationId) {
+        Reservation reservation = reservationMapper.selectById(reservationId);
+        if (reservation == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND, "预约不存在");
+        }
+        ApprovalTask task = approvalTaskMapper.selectByReservationId(reservationId);
+        List<com.hbnu.zen.dto.ApprovalTimelineStep> steps = new java.util.ArrayList<>();
+        com.hbnu.zen.dto.ApprovalTimelineStep submit = new com.hbnu.zen.dto.ApprovalTimelineStep();
+        submit.setName("提交申请");
+        submit.setStatus("DONE");
+        submit.setTime(reservation.getCreatedAt());
+        steps.add(submit);
+
+        com.hbnu.zen.dto.ApprovalTimelineStep approval = new com.hbnu.zen.dto.ApprovalTimelineStep();
+        approval.setName("管理员审批");
+        if (task == null || ApprovalStatus.PENDING.equals(task.getStatus())) {
+            approval.setStatus("PENDING");
+        } else if (ApprovalStatus.REJECTED.equals(task.getStatus())) {
+            approval.setStatus("REJECTED");
+            approval.setRemark(task.getRemark());
+            approval.setTime(task.getUpdatedAt());
+        } else {
+            approval.setStatus("DONE");
+            approval.setRemark(task.getRemark());
+            approval.setTime(task.getUpdatedAt());
+        }
+        steps.add(approval);
+
+        com.hbnu.zen.dto.ApprovalTimelineStep result = new com.hbnu.zen.dto.ApprovalTimelineStep();
+        result.setName("预约结果");
+        if (ReservationStatus.APPROVED.equals(reservation.getStatus())) {
+            result.setStatus("DONE");
+            result.setTime(reservation.getUpdatedAt());
+        } else if (ReservationStatus.REJECTED.equals(reservation.getStatus())) {
+            result.setStatus("REJECTED");
+            result.setTime(reservation.getUpdatedAt());
+        } else if (ReservationStatus.CANCELED.equals(reservation.getStatus())) {
+            result.setStatus("CANCELED");
+            result.setTime(reservation.getUpdatedAt());
+        } else {
+            result.setStatus("PENDING");
+        }
+        steps.add(result);
+        return steps;
+    }
+
     private String formatClassroom(Classroom classroom) {
         if (classroom == null) {
             return "未知教室";

@@ -27,3 +27,7 @@ VALUES
   ('BUS_CANCELED', '校车预约已取消', '你的校车预约已取消：{route} 发车时间 {departureTime}'),
   ('BUS_PROMOTED', '校车候补转正', '候补成功转正：{route} 发车时间 {departureTime}')
 ON DUPLICATE KEY UPDATE title = VALUES(title), content = VALUES(content);
+INSERT INTO message_template (template_code, title, content)
+VALUES
+  ('LECTURE_CHECKIN_SUCCESS', '讲座签到成功', '你已完成讲座签到：{lectureTitle} 时间 {startTime}')
+ON DUPLICATE KEY UPDATE title = VALUES(title), content = VALUES(content);

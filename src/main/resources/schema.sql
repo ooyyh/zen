@@ -172,3 +172,12 @@ CREATE TABLE IF NOT EXISTS bus_booking (
   KEY idx_bus_booking_user (user_id),
   KEY idx_bus_booking_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+-- Lecture check-in
+CREATE TABLE IF NOT EXISTS lecture_checkin (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  lecture_id BIGINT NOT NULL,
+  user_id BIGINT NOT NULL,
+  check_in_at DATETIME NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_lecture_checkin (lecture_id, user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

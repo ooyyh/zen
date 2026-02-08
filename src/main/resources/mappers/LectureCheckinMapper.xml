@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hbnu.zen.mapper.LectureCheckinMapper">
+    <resultMap id="CheckinMap" type="com.hbnu.zen.mybatis.entity.LectureCheckin">
+        <id column="id" property="id" />
+        <result column="lecture_id" property="lectureId" />
+        <result column="user_id" property="userId" />
+        <result column="check_in_at" property="checkInAt" />
+        <result column="created_at" property="createdAt" />
+    </resultMap>
+
+    <resultMap id="CheckinViewMap" type="com.hbnu.zen.dto.LectureCheckinView">
+        <result column="user_id" property="userId" />
+        <result column="username" property="username" />
+        <result column="check_in_at" property="checkInAt" />
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into lecture_checkin (lecture_id, user_id, check_in_at)
+        values (#{lectureId}, #{userId}, #{checkInAt})
+    </insert>
+
+    <select id="selectByLectureAndUser" resultMap="CheckinMap">
+        select * from lecture_checkin where lecture_id = #{lectureId} and user_id = #{userId}
+    </select>
+
+    <select id="selectViewsByLecture" resultMap="CheckinViewMap">
+        select c.user_id,
+               u.username,
+               c.check_in_at
+        from lecture_checkin c
+        join `user` u on u.id = c.user_id
+        where c.lecture_id = #{lectureId}
+        order by c.check_in_at desc
+    </select>
+</mapper>
