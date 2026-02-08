@@ -72,10 +72,34 @@ const router = createRouter({
       meta: { title: '通知中心', parent: '消息中心' }
     },
     {
+      path: '/equipments',
+      name: 'equipments',
+      component: () => import('../views/EquipmentListView.vue'),
+      meta: { title: '设备借用', parent: '设备管理' }
+    },
+    {
+      path: '/equipments/my',
+      name: 'equipments-my',
+      component: () => import('../views/EquipmentBorrowListView.vue'),
+      meta: { title: '我的设备', parent: '设备管理' }
+    },
+    {
       path: '/admin/classrooms',
       name: 'admin-classrooms',
       component: () => import('../views/AdminClassroomView.vue'),
       meta: { title: '教室管理', parent: '后台管理', admin: true }
+    },
+    {
+      path: '/admin/equipments',
+      name: 'admin-equipments',
+      component: () => import('../views/AdminEquipmentView.vue'),
+      meta: { title: '设备管理', parent: '后台管理', admin: true }
+    },
+    {
+      path: '/admin/equipments/borrows',
+      name: 'admin-equipments-borrows',
+      component: () => import('../views/AdminEquipmentBorrowView.vue'),
+      meta: { title: '借用审批', parent: '后台管理', admin: true }
     },
     {
       path: '/admin/lectures',
