@@ -1,4 +1,4 @@
-﻿package com.hbnu.zen.common;
+package com.hbnu.zen.common;
 
 public final class ApprovalStatus {
     public static final String PENDING = "PENDING";

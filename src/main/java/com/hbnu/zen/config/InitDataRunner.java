@@ -1,4 +1,4 @@
-﻿package com.hbnu.zen.config;
+package com.hbnu.zen.config;
 
 import com.hbnu.zen.common.Role;
 import com.hbnu.zen.mapper.UserMapper;

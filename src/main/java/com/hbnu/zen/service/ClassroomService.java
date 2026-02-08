@@ -1,4 +1,4 @@
-﻿package com.hbnu.zen.service;
+package com.hbnu.zen.service;
 
 import com.hbnu.zen.common.BusinessException;
 import com.hbnu.zen.common.ErrorCode;

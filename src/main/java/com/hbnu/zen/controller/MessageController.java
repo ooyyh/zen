@@ -1,4 +1,4 @@
-﻿package com.hbnu.zen.controller;
+package com.hbnu.zen.controller;
 
 import com.hbnu.zen.common.ApiResponse;
 import com.hbnu.zen.common.AuthUtil;

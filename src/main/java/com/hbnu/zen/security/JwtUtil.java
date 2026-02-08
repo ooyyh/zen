@@ -1,4 +1,4 @@
-﻿package com.hbnu.zen.security;
+package com.hbnu.zen.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

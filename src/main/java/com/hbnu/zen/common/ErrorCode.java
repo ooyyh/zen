@@ -1,4 +1,4 @@
-﻿package com.hbnu.zen.common;
+package com.hbnu.zen.common;
 
 public final class ErrorCode {
     public static final int UNAUTHORIZED = 401;

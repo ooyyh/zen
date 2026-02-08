@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hbnu.zen.mapper.LectureSignupMapper">
+    <resultMap id="SignupMap" type="com.hbnu.zen.mybatis.entity.LectureSignup">
+        <id column="id" property="id" />
+        <result column="lecture_id" property="lectureId" />
+        <result column="user_id" property="userId" />
+        <result column="status" property="status" />
+        <result column="created_at" property="createdAt" />
+    </resultMap>
+
+    <resultMap id="SignupViewMap" type="com.hbnu.zen.dto.LectureSignupView">
+        <id column="id" property="id" />
+        <result column="lecture_id" property="lectureId" />
+        <result column="title" property="title" />
+        <result column="speaker" property="speaker" />
+        <result column="location" property="location" />
+        <result column="start_time" property="startTime" />
+        <result column="end_time" property="endTime" />
+        <result column="status" property="status" />
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into lecture_signup (lecture_id, user_id, status)
+        values (#{lectureId}, #{userId}, #{status})
+    </insert>
+
+    <select id="selectByLectureAndUser" resultMap="SignupMap">
+        select * from lecture_signup where lecture_id = #{lectureId} and user_id = #{userId}
+    </select>
+
+    <update id="updateStatus">
+        update lecture_signup set status = #{status} where id = #{id}
+    </update>
+
+    <select id="countByStatus" resultType="int">
+        select count(1) from lecture_signup where lecture_id = #{lectureId} and status = #{status}
+    </select>
+
+    <select id="selectEarliestWaitlist" resultMap="SignupMap">
+        select * from lecture_signup
+        where lecture_id = #{lectureId} and status = #{status}
+        order by created_at asc
+        limit 1
+    </select>
+
+    <select id="selectMySignups" resultMap="SignupViewMap">
+        select s.id,
+               s.lecture_id,
+               s.status,
+               l.title,
+               l.speaker,
+               l.location,
+               l.start_time,
+               l.end_time
+        from lecture_signup s
+        join lecture l on l.id = s.lecture_id
+        where s.user_id = #{userId}
+        order by s.created_at desc
+    </select>
+</mapper>

@@ -1,4 +1,4 @@
-﻿package com.hbnu.zen.common;
+package com.hbnu.zen.common;
 
 public class BusinessException extends RuntimeException {
     private final int code;

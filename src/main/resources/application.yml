@@ -29,3 +29,6 @@ app:
   reservation:
     lock-wait-ms: 800
     lock-lease-ms: 5000
+  lecture:
+    lock-wait-ms: 800
+    lock-lease-ms: 5000

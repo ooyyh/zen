@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hbnu.zen.mapper.LectureMapper">
+    <resultMap id="LectureMap" type="com.hbnu.zen.mybatis.entity.Lecture">
+        <id column="id" property="id" />
+        <result column="title" property="title" />
+        <result column="speaker" property="speaker" />
+        <result column="location" property="location" />
+        <result column="start_time" property="startTime" />
+        <result column="end_time" property="endTime" />
+        <result column="capacity" property="capacity" />
+        <result column="status" property="status" />
+        <result column="created_at" property="createdAt" />
+        <result column="updated_at" property="updatedAt" />
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into lecture (title, speaker, location, start_time, end_time, capacity, status)
+        values (#{title}, #{speaker}, #{location}, #{startTime}, #{endTime}, #{capacity}, #{status})
+    </insert>
+
+    <update id="update">
+        update lecture
+        set title = #{title},
+            speaker = #{speaker},
+            location = #{location},
+            start_time = #{startTime},
+            end_time = #{endTime},
+            capacity = #{capacity},
+            status = #{status}
+        where id = #{id}
+    </update>
+
+    <select id="selectById" resultMap="LectureMap">
+        select * from lecture where id = #{id}
+    </select>
+
+    <select id="selectAll" resultMap="LectureMap">
+        select * from lecture
+        <if test="status != null and status != ''">
+            where status = #{status}
+        </if>
+        order by start_time desc
+    </select>
+</mapper>

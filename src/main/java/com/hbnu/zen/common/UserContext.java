@@ -1,4 +1,4 @@
-﻿package com.hbnu.zen.common;
+package com.hbnu.zen.common;
 
 public final class UserContext {
     private static final ThreadLocal<UserSession> HOLDER = new ThreadLocal<>();

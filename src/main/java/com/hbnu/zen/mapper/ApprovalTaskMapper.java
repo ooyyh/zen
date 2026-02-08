@@ -1,4 +1,4 @@
-﻿package com.hbnu.zen.mapper;
+package com.hbnu.zen.mapper;
 
 import com.hbnu.zen.mybatis.entity.ApprovalTask;
 import org.apache.ibatis.annotations.Mapper;

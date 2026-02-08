@@ -1,4 +1,4 @@
-﻿package com.hbnu.zen.config;
+package com.hbnu.zen.config;
 
 import com.hbnu.zen.common.ApiResponse;
 import com.hbnu.zen.common.BusinessException;

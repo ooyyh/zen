@@ -1,4 +1,4 @@
-﻿package com.hbnu.zen.config;
+package com.hbnu.zen.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

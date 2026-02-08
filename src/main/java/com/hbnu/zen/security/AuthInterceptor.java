@@ -1,4 +1,4 @@
-﻿package com.hbnu.zen.security;
+package com.hbnu.zen.security;
 
 import com.hbnu.zen.common.ApiResponse;
 import com.hbnu.zen.common.ErrorCode;

@@ -1,4 +1,4 @@
-﻿package com.hbnu.zen.mybatis.entity;
+package com.hbnu.zen.mybatis.entity;
 
 import lombok.Data;
 

@@ -1,4 +1,4 @@
-﻿package com.hbnu.zen.dto;
+package com.hbnu.zen.dto;
 
 public class ReservationRules {
     private Integer timeSlotMinutes;
