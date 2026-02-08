@@ -138,6 +138,12 @@ const router = createRouter({
       meta: { title: '讲座管理', parent: '后台管理', admin: true }
     },
     {
+      path: '/admin/lectures/checkins',
+      name: 'admin-lecture-checkins',
+      component: () => import('../views/AdminLectureCheckinView.vue'),
+      meta: { title: '讲座签到', parent: '后台管理', admin: true }
+    },
+    {
       path: '/admin/users',
       name: 'admin-users',
       component: () => import('../views/AdminUserView.vue'),

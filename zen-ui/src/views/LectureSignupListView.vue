@@ -29,6 +29,15 @@ const cancel = async (lectureId) => {
   }
 }
 
+const checkin = async (lectureId) => {
+  try {
+    await request(`/api/lectures/${lectureId}/checkin`, { method: 'POST' })
+    await load()
+  } catch (e) {
+    alert(e.message || '签到失败')
+  }
+}
+
 const statusText = (status) => {
   switch (status) {
     case 'SIGNED_UP':
@@ -37,6 +46,8 @@ const statusText = (status) => {
       return '候补中'
     case 'CANCELED':
       return '已取消'
+    case 'CHECKED_IN':
+      return '已签到'
     default:
       return status
   }
@@ -65,9 +76,20 @@ onMounted(load)
             <td>{{ item.startTime }} - {{ item.endTime }}</td>
             <td>{{ item.location || '-' }}</td>
             <td><span class="tag">{{ statusText(item.status) }}</span></td>
-            <td>
-              <button class="btn ghost" @click="cancel(item.lectureId)" :disabled="item.status === 'CANCELED'">
+            <td class="actions">
+              <button
+                class="btn ghost"
+                @click="cancel(item.lectureId)"
+                :disabled="item.status !== 'SIGNED_UP'"
+              >
                 取消
+              </button>
+              <button
+                class="btn primary"
+                @click="checkin(item.lectureId)"
+                :disabled="item.status !== 'SIGNED_UP'"
+              >
+                签到
               </button>
             </td>
           </tr>
@@ -81,6 +103,11 @@ onMounted(load)
 <style scoped>
 .table-card {
   padding: 10px 16px 18px;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
 }
 
 .error-card {
