@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hbnu.zen.mapper.MessageTemplateMapper">
+    <resultMap id="TemplateMap" type="com.hbnu.zen.mybatis.entity.MessageTemplate">
+        <id column="id" property="id" />
+        <result column="template_code" property="templateCode" />
+        <result column="title" property="title" />
+        <result column="content" property="content" />
+        <result column="created_at" property="createdAt" />
+        <result column="updated_at" property="updatedAt" />
+    </resultMap>
+
+    <select id="selectByCode" resultMap="TemplateMap">
+        select * from message_template where template_code = #{templateCode}
+    </select>
+</mapper>

@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hbnu.zen.mapper.ApprovalTaskMapper">
+    <resultMap id="ApprovalMap" type="com.hbnu.zen.mybatis.entity.ApprovalTask">
+        <id column="id" property="id" />
+        <result column="reservation_id" property="reservationId" />
+        <result column="approver_role" property="approverRole" />
+        <result column="approver_id" property="approverId" />
+        <result column="status" property="status" />
+        <result column="remark" property="remark" />
+        <result column="created_at" property="createdAt" />
+        <result column="updated_at" property="updatedAt" />
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into approval_task (reservation_id, approver_role, approver_id, status, remark)
+        values (#{reservationId}, #{approverRole}, #{approverId}, #{status}, #{remark})
+    </insert>
+
+    <select id="selectById" resultMap="ApprovalMap">
+        select * from approval_task where id = #{id}
+    </select>
+
+    <select id="selectByReservationId" resultMap="ApprovalMap">
+        select * from approval_task where reservation_id = #{reservationId}
+    </select>
+
+    <select id="selectPending" resultMap="ApprovalMap">
+        select * from approval_task
+        where status = #{status}
+          and approver_role = #{role}
+        order by created_at desc
+    </select>
+
+    <update id="updateDecision">
+        update approval_task
+        set status = #{status},
+            approver_id = #{approverId},
+            remark = #{remark}
+        where id = #{id}
+    </update>
+
+    <select id="countPending" resultType="int">
+        select count(1) from approval_task
+        where status = #{status}
+          and approver_role = #{role}
+    </select>
+</mapper>

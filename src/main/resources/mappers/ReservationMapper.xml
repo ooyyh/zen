@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hbnu.zen.mapper.ReservationMapper">
+    <resultMap id="ReservationMap" type="com.hbnu.zen.mybatis.entity.Reservation">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="classroom_id" property="classroomId" />
+        <result column="start_time" property="startTime" />
+        <result column="end_time" property="endTime" />
+        <result column="status" property="status" />
+        <result column="approval_required" property="approvalRequired" />
+        <result column="reason" property="reason" />
+        <result column="created_at" property="createdAt" />
+        <result column="updated_at" property="updatedAt" />
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into reservation (user_id, classroom_id, start_time, end_time, status, approval_required, reason)
+        values (#{userId}, #{classroomId}, #{startTime}, #{endTime}, #{status}, #{approvalRequired}, #{reason})
+    </insert>
+
+    <select id="selectById" resultMap="ReservationMap">
+        select * from reservation where id = #{id}
+    </select>
+
+    <select id="selectByUserId" resultMap="ReservationMap">
+        select * from reservation where user_id = #{userId} order by start_time desc
+    </select>
+
+    <select id="countConflicts" resultType="int">
+        select count(1) from reservation
+        where classroom_id = #{classroomId}
+          and status in
+          <foreach collection="statuses" item="s" open="(" separator="," close=")">
+              #{s}
+          </foreach>
+          and start_time &lt; #{endTime}
+          and end_time &gt; #{startTime}
+    </select>
+
+    <select id="countUserDaily" resultType="int">
+        select count(1) from reservation
+        where user_id = #{userId}
+          and status in
+          <foreach collection="statuses" item="s" open="(" separator="," close=")">
+              #{s}
+          </foreach>
+          and start_time &gt;= #{dayStart}
+          and start_time &lt; #{dayEnd}
+    </select>
+
+    <update id="updateStatus">
+        update reservation set status = #{status} where id = #{id}
+    </update>
+
+    <select id="countAll" resultType="int">
+        select count(1) from reservation
+    </select>
+
+    <select id="countByStatus" resultType="int">
+        select count(1) from reservation where status = #{status}
+    </select>
+</mapper>
