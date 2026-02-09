@@ -1,83 +1,58 @@
-@startuml ???????
+@startuml Frontend Structure
 !theme plain
 skinparam backgroundColor #FFFFFF
-skinparam package {
-  BackgroundColor #EFF6FF
-  BorderColor #2563EB
-}
-skinparam component {
-  BackgroundColor #ECFDF5
-  BorderColor #16A34A
-}
 
-title Zen Campus ???????? - ???????
+title Zen Campus - Frontend Page Structure
 
-package "????" as Shell {
-  [AppShell] as AppShell
-  [??? LoginView] as LoginView
-  [??? RegisterView] as RegisterView
-  [?? HomeView] as HomeView
-  [??? DashboardView] as DashboardView
+package "Shell" {
+  [AppShell]
+  [HomeView]
+  [DashboardView]
+  [LoginView]
+  [RegisterView]
 }
 
-package "??????" as StudentPages {
-  [???? ClassroomListView] as ClassroomList
-  [???? ReservationCreateView] as ReservationCreate
-  [???? ReservationListView] as ReservationMy
-  [???? LectureListView] as LectureList
-  [???? LectureSignupListView] as LectureMy
-  [???? EquipmentListView] as EquipmentList
-  [???? EquipmentBorrowListView] as EquipmentMy
-  [???? BusTripListView] as BusTrips
-  [???? BusBookingListView] as BusMy
-  [????? StudyRoomListView] as StudyRoomList
-  [??? SeatSelectionView] as SeatSelection
-  [???? SeatReservationListView] as SeatMy
-  [???? MessageListView] as MessageList
+package "Student Pages" {
+  [ClassroomListView]
+  [ReservationCreateView]
+  [ReservationListView]
+  [LectureListView]
+  [LectureSignupListView]
+  [EquipmentListView]
+  [EquipmentBorrowListView]
+  [BusTripListView]
+  [BusBookingListView]
+  [StudyRoomListView]
+  [SeatSelectionView]
+  [SeatReservationListView]
+  [MessageListView]
 }
 
-package "??????" as AdminPages {
-  [???? ApprovalListView] as ApprovalView
-  [???? AdminReportView] as ReportView
-  [???? AdminUserView] as UserView
-  [???? AdminClassroomView] as AdminClassroom
-  [???? AdminLectureView] as AdminLecture
-  [???? AdminEquipmentView] as AdminEquipment
-  [???? AdminEquipmentBorrowView] as AdminBorrow
-  [???? AdminBusRouteView] as AdminRoute
-  [???? AdminBusTripView] as AdminTrip
-  [???? AdminBusBookingView] as AdminBooking
-  [????? AdminStudyRoomView] as AdminRoom
-  [???? AdminSeatManagementView] as AdminSeat
-  [???? AdminSeatReservationView] as AdminSeatRes
-  [???? AdminMessageTemplateView] as AdminTpl
-  [???? AdminBroadcastView] as AdminBroadcast
-  [???? AdminConfigView] as AdminConfig
+package "Admin Pages" {
+  [ApprovalListView]
+  [AdminReportView]
+  [AdminUserView]
+  [AdminClassroomView]
+  [AdminLectureView]
+  [AdminEquipmentView]
+  [AdminBusRouteView]
+  [AdminBusTripView]
+  [AdminStudyRoomView]
+  [AdminSeatManagementView]
+  [AdminMessageTemplateView]
+  [AdminConfigView]
 }
 
-package "??????" as FrontendServices {
-  [router/index.js] as Router
-  [services/api.js] as ApiService
-  [services/auth.js] as AuthService
-  [services/websocket.js] as WsService
+package "Services" {
+  [router/index.js]
+  [services/api.js]
+  [services/auth.js]
+  [services/websocket.js]
 }
 
-package "????" as Charts {
-  [ECharts ??/??/??] as Echarts
-}
-
-AppShell --> StudentPages
-AppShell --> AdminPages
-AppShell --> Router
-StudentPages --> ApiService
-AdminPages --> ApiService
-StudentPages --> WsService
-DashboardView --> Echarts
-ReportView --> Echarts
-AuthService --> ApiService
-
-note bottom
-  ????????? / ???? / ???????????????
-end note
+AppShell --> "Student Pages"
+AppShell --> "Admin Pages"
+"Student Pages" --> "Services"
+"Admin Pages" --> "Services"
 
 @enduml

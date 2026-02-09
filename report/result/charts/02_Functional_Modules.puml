@@ -1,91 +1,57 @@
-@startuml ?????
+@startuml Functional Modules
 !theme plain
 skinparam backgroundColor #FFFFFF
 skinparam packageStyle rectangle
 
-title Zen Campus ???????? - ?????
+title Zen Campus - Functional Modules
 
-package "???????" as AuthModule {
-  [????] as Login
-  [????] as Register
-  [JWT ??] as Jwt
-  [??????] as Rbac
+package "Auth and RBAC" {
+  [Login/Register]
+  [JWT Auth]
+  [Role Permission]
 }
 
-package "??????" as ClassroomModule {
-  [??????] as ClassroomList
-  [????] as ReservationCreate
-  [????] as ReservationCancel
-  [????] as ReservationApproval
-  [?????] as ReservationTimeline
+package "Classroom Reservation" {
+  [Resource List]
+  [Create Reservation]
+  [Approval Workflow]
+  [Timeline]
 }
 
-package "??????" as LectureModule {
-  [??????] as LecturePublish
-  [????] as LectureSignup
-  [????] as LectureCapacity
-  [????] as LectureWaitlist
-  [????] as LectureCheckin
+package "Lecture" {
+  [Publish Lecture]
+  [Signup]
+  [Waitlist]
+  [Check-in]
 }
 
-package "??????" as EquipmentModule {
-  [????] as EquipmentCatalog
-  [????] as EquipmentBorrow
-  [????] as EquipmentApprove
-  [????] as EquipmentReject
-  [????] as EquipmentReturn
+package "Equipment Borrow" {
+  [Equipment Catalog]
+  [Borrow Request]
+  [Approve/Reject]
+  [Return]
 }
 
-package "??????" as BusModule {
-  [????] as RouteManage
-  [????] as TripManage
-  [????] as BusBook
-  [????] as BusPromote
-  [????] as BusCancel
+package "Campus Bus" {
+  [Route Management]
+  [Trip Management]
+  [Booking]
+  [Waitlist Promotion]
 }
 
-package "?????" as StudyRoomModule {
-  [?????] as RoomList
-  [?????] as SeatCanvas
-  [????] as SeatReserve
-  [????(Pending)] as SeatPending
-  [??????] as SeatRealtime
+package "Study Room" {
+  [Room and Seat List]
+  [Seat Reservation]
+  [Pending Seat TTL]
+  [Realtime Seat Status]
 }
 
-package "???????" as OpsModule {
-  [??????] as TemplateManage
-  [??????] as Inbox
-  [????] as Broadcast
-  [??????] as RuleConfig
+package "Messaging and Ops" {
+  [Message Templates]
+  [Inbox]
+  [Broadcast]
+  [Rule Config]
+  [Dashboard and Reports]
 }
-
-package "??????" as AdminModule {
-  [????] as UserManage
-  [????] as ResourceManage
-  [?????] as ApprovalDesk
-  [????] as Reports
-  [????] as Dashboard
-}
-
-AuthModule --> ClassroomModule
-AuthModule --> LectureModule
-AuthModule --> EquipmentModule
-AuthModule --> BusModule
-AuthModule --> StudyRoomModule
-
-ClassroomModule --> OpsModule
-LectureModule --> OpsModule
-EquipmentModule --> OpsModule
-BusModule --> OpsModule
-StudyRoomModule --> OpsModule
-
-OpsModule --> AdminModule
-
-note bottom
-  **????**
-  - ????????????
-  - ??????? + ?????
-  - WebSocket ????????
-end note
 
 @enduml

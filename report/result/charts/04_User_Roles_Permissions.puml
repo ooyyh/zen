@@ -1,63 +1,63 @@
-@startuml ???????
+@startuml Roles and Permissions
 !theme plain
 skinparam backgroundColor #FFFFFF
-skinparam actor {
-  BackgroundColor #E8F5E8
-  BorderColor #16A34A
-}
-skinparam package {
-  BackgroundColor #FFF7ED
-  BorderColor #EA580C
-}
 
-title Zen Campus ???????? - ???????
+title Zen Campus - Roles and Permissions
 
-actor "?? (STUDENT)" as Student
-actor "?? (TEACHER)" as Teacher
-actor "??? (ADMIN)" as Admin
+actor Student
+actor Teacher
+actor Admin
 
-package "????" as CommonPerm {
-  [???????] as PermProfile
-  [??????] as PermInbox
-  [??????] as PermMine
+rectangle "Common" {
+  usecase "Login and Profile" as U1
+  usecase "Inbox" as U2
 }
 
-package "??????" as StudentPerm {
-  [????/??] as PermClassroom
-  [????/??/??] as PermLecture
-  [??????] as PermEquipment
-  [????/??] as PermBus
-  [?????/??] as PermSeat
+rectangle "Student" {
+  usecase "Classroom Reservation" as U3
+  usecase "Lecture Signup" as U4
+  usecase "Equipment Request" as U5
+  usecase "Bus Booking" as U6
+  usecase "Seat Reservation" as U7
 }
 
-package "??????" as TeacherPerm {
-  [????] as PermLectureManage
-  [??????] as PermLectureCheckin
-  [????] as PermBroadcast
-  [??????] as PermEquipmentApprove
-  [???????] as PermStudyRoomManage
+rectangle "Teacher" {
+  usecase "Lecture Management" as U8
+  usecase "Broadcast" as U9
+  usecase "Partial Approvals" as U10
 }
 
-package "?????" as AdminPerm {
-  [????] as PermUserManage
-  [????] as PermApproval
-  [???????] as PermResourceManage
-  [??????] as PermConfig
-  [??????] as PermTemplate
-  [???????] as PermReport
+rectangle "Admin" {
+  usecase "User Management" as U11
+  usecase "Global Approval" as U12
+  usecase "Rule Config" as U13
+  usecase "Template Management" as U14
+  usecase "Reports" as U15
 }
 
-Student --> CommonPerm
-Teacher --> CommonPerm
-Admin --> CommonPerm
+Student --> U1
+Student --> U2
+Student --> U3
+Student --> U4
+Student --> U5
+Student --> U6
+Student --> U7
 
-Student --> StudentPerm
-Teacher --> TeacherPerm
-Admin --> TeacherPerm
-Admin --> AdminPerm
+Teacher --> U1
+Teacher --> U2
+Teacher --> U8
+Teacher --> U9
+Teacher --> U10
 
-note bottom
-  ?????? JWT ???????????????
-end note
+Admin --> U1
+Admin --> U2
+Admin --> U8
+Admin --> U9
+Admin --> U10
+Admin --> U11
+Admin --> U12
+Admin --> U13
+Admin --> U14
+Admin --> U15
 
 @enduml

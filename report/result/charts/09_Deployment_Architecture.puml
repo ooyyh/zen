@@ -1,69 +1,34 @@
-@startuml ?????
+@startuml Deployment Architecture
 !theme plain
 skinparam backgroundColor #FFFFFF
-skinparam cloud {
-  BackgroundColor #ECFEFF
-  BorderColor #0891B2
-}
-skinparam node {
-  BackgroundColor #F8FAFC
-  BorderColor #334155
-}
 
-title Zen Campus ???????? - ?????
+title Zen Campus - Deployment Architecture
 
-cloud "????" as Users {
-  [PC ???] as PC
-  [??????] as Mobile
+cloud "Clients" {
+  [PC Browser]
+  [Mobile Browser]
 }
 
-node "???" as Access {
-  [Nginx ????] as Nginx
+node "Access Layer" {
+  [Nginx Reverse Proxy]
 }
 
-node "????" as Frontend {
-  [Vue Dist ????] as VueDist
+node "Frontend" {
+  [Vue Dist Static Assets]
 }
 
-node "???" as Backend {
-  [Spring Boot ?? #1] as App1
-  [Spring Boot ?? #2 (???)] as App2
+node "Application" {
+  [Spring Boot Instance A]
+  [Spring Boot Instance B]
 }
 
-node "???" as Data {
-  database "MySQL (zen)" as Mysql
-  [Redis (?/???)] as Redis
+node "Data" {
+  database "MySQL (zen)"
+  [Redis]
 }
 
-node "??????" as Realtime {
-  [WebSocket STOMP Broker] as WsBroker
+node "Realtime" {
+  [WebSocket STOMP Broker]
 }
-
-node "???" as Ops {
-  [????] as Logs
-  [????(???)] as Monitor
-}
-
-Users --> Nginx : HTTPS
-Nginx --> VueDist : ????
-Nginx --> App1 : /api/*
-Nginx --> App2 : /api/*
-
-App1 --> Mysql
-App2 --> Mysql
-App1 --> Redis
-App2 --> Redis
-App1 --> WsBroker
-App2 --> WsBroker
-
-App1 --> Logs
-App2 --> Logs
-Mysql --> Logs
-Redis --> Logs
-Logs --> Monitor
-
-note bottom
-  ?????????????????????????
-end note
 
 @enduml

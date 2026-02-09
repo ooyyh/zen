@@ -1,180 +1,110 @@
-@startuml ???ER?
+@startuml Database ER
 !theme plain
 skinparam backgroundColor #FFFFFF
-skinparam entity {
-  BackgroundColor #E8F4FF
-  BorderColor #1D4ED8
-}
 
-title Zen Campus ???????? - ??? ER ?
+title Zen Campus - Core ER
 
-entity "user" as user {
+entity user {
   * id : BIGINT <<PK>>
   --
-  username : VARCHAR(64) <<UK>>
-  password_hash : VARCHAR(255)
-  role : VARCHAR(20)
-  real_name : VARCHAR(100)
-  status : TINYINT
+  username : VARCHAR
+  role : VARCHAR
 }
 
-entity "classroom" as classroom {
+entity classroom {
   * id : BIGINT <<PK>>
-  --
-  building : VARCHAR(64)
-  room_no : VARCHAR(64)
-  capacity : INT
-  status : TINYINT
 }
 
-entity "reservation" as reservation {
+entity reservation {
   * id : BIGINT <<PK>>
   --
   user_id : BIGINT <<FK>>
   classroom_id : BIGINT <<FK>>
-  start_time : DATETIME
-  end_time : DATETIME
-  status : VARCHAR(32)
-  approval_required : TINYINT
+  status : VARCHAR
 }
 
-entity "approval_task" as approval_task {
+entity approval_task {
   * id : BIGINT <<PK>>
   --
   reservation_id : BIGINT <<FK>>
-  approver_id : BIGINT <<FK>>
-  approver_role : VARCHAR(20)
-  status : VARCHAR(20)
 }
 
-entity "lecture" as lecture {
+entity lecture {
   * id : BIGINT <<PK>>
-  --
-  title : VARCHAR(128)
-  capacity : INT
-  status : VARCHAR(20)
 }
 
-entity "lecture_signup" as lecture_signup {
+entity lecture_signup {
   * id : BIGINT <<PK>>
   --
   lecture_id : BIGINT <<FK>>
   user_id : BIGINT <<FK>>
-  status : VARCHAR(20)
 }
 
-entity "lecture_checkin" as lecture_checkin {
+entity equipment {
   * id : BIGINT <<PK>>
-  --
-  lecture_id : BIGINT <<FK>>
-  user_id : BIGINT <<FK>>
-  check_in_at : DATETIME
 }
 
-entity "equipment" as equipment {
-  * id : BIGINT <<PK>>
-  --
-  name : VARCHAR(128)
-  total_qty : INT
-  status : TINYINT
-}
-
-entity "equipment_borrow" as equipment_borrow {
+entity equipment_borrow {
   * id : BIGINT <<PK>>
   --
   equipment_id : BIGINT <<FK>>
   user_id : BIGINT <<FK>>
-  status : VARCHAR(20)
-  approved_by : BIGINT <<FK>>
 }
 
-entity "bus_route" as bus_route {
+entity bus_route {
   * id : BIGINT <<PK>>
-  --
-  name : VARCHAR(128)
-  origin : VARCHAR(128)
-  destination : VARCHAR(128)
 }
 
-entity "bus_trip" as bus_trip {
+entity bus_trip {
   * id : BIGINT <<PK>>
   --
   route_id : BIGINT <<FK>>
-  departure_time : DATETIME
-  capacity : INT
-  status : VARCHAR(20)
 }
 
-entity "bus_booking" as bus_booking {
+entity bus_booking {
   * id : BIGINT <<PK>>
   --
   trip_id : BIGINT <<FK>>
   user_id : BIGINT <<FK>>
-  status : VARCHAR(20)
 }
 
-entity "study_room" as study_room {
+entity study_room {
   * id : BIGINT <<PK>>
-  --
-  name : VARCHAR(128)
-  building : VARCHAR(64)
-  total_seats : INT
-  status : TINYINT
 }
 
-entity "seat" as seat {
+entity seat {
   * id : BIGINT <<PK>>
   --
   study_room_id : BIGINT <<FK>>
-  seat_no : VARCHAR(32)
-  seat_type : VARCHAR(32)
-  position_x : INT
-  position_y : INT
-  status : TINYINT
 }
 
-entity "seat_reservation" as seat_reservation {
+entity seat_reservation {
   * id : BIGINT <<PK>>
   --
   seat_id : BIGINT <<FK>>
   user_id : BIGINT <<FK>>
-  start_time : DATETIME
-  end_time : DATETIME
-  status : VARCHAR(20)
 }
 
-entity "message_template" as message_template {
+entity message_template {
   * id : BIGINT <<PK>>
-  --
-  template_code : VARCHAR(64) <<UK>>
-  title : VARCHAR(128)
-  content : TEXT
 }
 
-entity "message" as message {
+entity message {
   * id : BIGINT <<PK>>
   --
   user_id : BIGINT <<FK>>
-  template_code : VARCHAR(64)
-  status : VARCHAR(16)
-  read_at : DATETIME
 }
 
-entity "sys_config" as sys_config {
-  * config_key : VARCHAR(64) <<PK>>
-  --
-  config_value : TEXT
+entity sys_config {
+  * config_key : VARCHAR <<PK>>
 }
 
 user ||--o{ reservation
 classroom ||--o{ reservation
 reservation ||--o| approval_task
-user ||--o{ approval_task
 
 lecture ||--o{ lecture_signup
 user ||--o{ lecture_signup
-lecture ||--o{ lecture_checkin
-user ||--o{ lecture_checkin
 
 equipment ||--o{ equipment_borrow
 user ||--o{ equipment_borrow
@@ -189,9 +119,5 @@ user ||--o{ seat_reservation
 
 message_template ||--o{ message
 user ||--o{ message
-
-note bottom
-  `sys_config` ????????? reservation_rules?
-end note
 
 @enduml
