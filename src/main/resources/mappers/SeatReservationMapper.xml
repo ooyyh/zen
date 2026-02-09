@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hbnu.zen.mapper.SeatReservationMapper">
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO seat_reservation (seat_id, user_id, start_time, end_time, status)
+        VALUES (#{seatId}, #{userId}, #{startTime}, #{endTime}, #{status})
+    </insert>
+
+    <select id="selectById" resultType="SeatReservation">
+        SELECT * FROM seat_reservation WHERE id = #{id}
+    </select>
+
+    <select id="selectMyViews" resultType="com.hbnu.zen.dto.SeatReservationView">
+        SELECT
+            res.id,
+            res.seat_id AS seatId,
+            s.seat_no AS seatNo,
+            sr.name AS studyRoomName,
+            sr.building,
+            sr.floor,
+            res.start_time AS startTime,
+            res.end_time AS endTime,
+            res.status,
+            res.check_in_at AS checkInAt
+        FROM seat_reservation res
+        INNER JOIN seat s ON s.id = res.seat_id
+        INNER JOIN study_room sr ON sr.id = s.study_room_id
+        WHERE res.user_id = #{userId}
+        ORDER BY res.created_at DESC
+    </select>
+
+    <select id="selectAllViews" resultType="com.hbnu.zen.dto.SeatReservationView">
+        SELECT
+            res.id,
+            res.seat_id AS seatId,
+            s.seat_no AS seatNo,
+            sr.name AS studyRoomName,
+            sr.building,
+            sr.floor,
+            res.start_time AS startTime,
+            res.end_time AS endTime,
+            res.status,
+            res.check_in_at AS checkInAt
+        FROM seat_reservation res
+        INNER JOIN seat s ON s.id = res.seat_id
+        INNER JOIN study_room sr ON sr.id = s.study_room_id
+        ORDER BY res.created_at DESC
+    </select>
+
+    <select id="countOverlap" resultType="int">
+        SELECT COUNT(*)
+        FROM seat_reservation
+        WHERE seat_id = #{seatId}
+          AND status IN
+        <foreach collection="blockingStatuses" item="status" open="(" separator="," close=")">
+            #{status}
+        </foreach>
+          AND start_time &lt; #{endTime}
+          AND end_time &gt; #{startTime}
+    </select>
+
+    <update id="updateStatus">
+        UPDATE seat_reservation SET status = #{status}, updated_at = NOW() WHERE id = #{id}
+    </update>
+
+    <update id="updateCheckIn">
+        UPDATE seat_reservation SET check_in_at = #{checkInAt}, status = 'CHECKED_IN', updated_at = NOW() WHERE id = #{id}
+    </update>
+</mapper>

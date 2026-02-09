@@ -86,4 +86,8 @@
     <select id="countAll" resultType="int">
         select count(1) from bus_trip
     </select>
+
+    <select id="countByStatus" resultType="int">
+        select count(1) from bus_trip where status = #{status}
+    </select>
 </mapper>

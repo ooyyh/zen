@@ -60,4 +60,31 @@
     <select id="countByStatus" resultType="int">
         select count(1) from reservation where status = #{status}
     </select>
+
+    <resultMap id="HotClassroomMap" type="com.hbnu.zen.dto.HomeClassroomHot">
+        <id column="id" property="id" />
+        <result column="building" property="building" />
+        <result column="room_no" property="roomNo" />
+        <result column="capacity" property="capacity" />
+        <result column="location" property="location" />
+        <result column="equipment_json" property="equipmentJson" />
+        <result column="reservation_count" property="reservationCount" />
+    </resultMap>
+
+    <select id="selectHotClassrooms" resultMap="HotClassroomMap">
+        select c.id,
+               c.building,
+               c.room_no,
+               c.capacity,
+               c.location,
+               c.equipment_json,
+               count(r.id) as reservation_count
+        from classroom c
+        left join reservation r
+            on r.classroom_id = c.id
+            and r.status in ('APPROVED', 'PENDING_APPROVAL')
+        group by c.id
+        order by reservation_count desc, c.building, c.room_no
+        limit #{limit}
+    </select>
 </mapper>

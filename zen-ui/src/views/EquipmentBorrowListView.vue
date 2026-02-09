@@ -76,10 +76,10 @@ onMounted(load)
             <td><span class="tag">{{ statusText(item.status) }}</span></td>
             <td>{{ item.reason || '-' }}</td>
             <td class="actions">
-              <button class="btn ghost" @click="cancel(item.id)" :disabled="item.status !== 'PENDING'">
+              <button v-if="item.status === 'PENDING'" class="btn ghost" @click="cancel(item.id)">
                 取消
               </button>
-              <button class="btn primary" @click="returnEquip(item.id)" :disabled="item.status !== 'APPROVED'">
+              <button v-if="item.status === 'APPROVED'" class="btn primary" @click="returnEquip(item.id)">
                 归还
               </button>
             </td>

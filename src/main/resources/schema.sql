@@ -181,3 +181,45 @@ CREATE TABLE IF NOT EXISTS lecture_checkin (
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   UNIQUE KEY uk_lecture_checkin (lecture_id, user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Study room module
+CREATE TABLE IF NOT EXISTS study_room (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(128) NOT NULL,
+  building VARCHAR(64) NOT NULL,
+  floor INT NOT NULL,
+  area VARCHAR(64),
+  total_seats INT NOT NULL,
+  status TINYINT NOT NULL DEFAULT 1,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS seat (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  study_room_id BIGINT NOT NULL,
+  seat_no VARCHAR(32) NOT NULL,
+  seat_type VARCHAR(32),
+  has_power TINYINT NOT NULL DEFAULT 0,
+  status TINYINT NOT NULL DEFAULT 1,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_seat (study_room_id, seat_no),
+  KEY idx_seat_room (study_room_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS seat_reservation (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  seat_id BIGINT NOT NULL,
+  user_id BIGINT NOT NULL,
+  start_time DATETIME NOT NULL,
+  end_time DATETIME NOT NULL,
+  status VARCHAR(20) NOT NULL,
+  check_in_at DATETIME,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY idx_seat_reservation_seat (seat_id),
+  KEY idx_seat_reservation_user (user_id),
+  KEY idx_seat_reservation_time (start_time, end_time),
+  KEY idx_seat_reservation_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

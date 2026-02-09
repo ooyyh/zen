@@ -1,287 +1,325 @@
 <script setup>
+import { computed, onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import MarketingLayout from '@/components/MarketingLayout.vue'
+import { request } from '@/services/api'
+import { isLoggedIn } from '@/services/auth'
+
+const text = {
+  badge: '校园综合服务系统 · 实时数据',
+  heroTitle: '一个入口，统一预约、审批与消息触达。',
+  heroSub: '教室、讲座、设备与校车服务统一管理，真实数据实时同步。',
+  enterConsole: '进入控制台',
+  startReservation: '发起预约',
+  summary: {
+    classroom: '教室资源',
+    equipment: '设备资源',
+    lecture: '开放讲座',
+    bus: '开放班次'
+  },
+  badges: {
+    pendingApproval: '待审批',
+    reservationPending: '预约待审'
+  },
+  hot: {
+    title: '热门教室',
+    desc: '按预约次数排序',
+    refresh: '刷新',
+    empty: '暂无数据',
+    approvedTitle: '当前预约通过',
+    approvedDesc: '已批准',
+    approvedUnit: '条',
+    status: '实时',
+    times: '次',
+    capacity: '容量',
+    locationEmpty: '未填写位置'
+  },
+  services: {
+    title: '服务入口',
+    sub: '6 大高频业务直达'
+  },
+  lectures: {
+    title: '近期讲座',
+    sub: '开放报名讲座',
+    empty: '暂无讲座',
+    viewAll: '查看全部讲座',
+    locationEmpty: '未填写地点',
+    capacity: '容量'
+  },
+  highlights: {
+    title: '系统亮点',
+    sub: '已上线能力'
+  },
+  notices: {
+    title: '通知中心',
+    sub: '最新站内消息',
+    login: '登录后查看你的消息',
+    goLogin: '去登录',
+    empty: '暂无消息',
+    view: '进入消息中心',
+    error: '消息加载失败'
+  },
+  errors: {
+    load: '加载失败'
+  }
+}
+
 const services = [
   {
     title: '教室预约',
-    desc: '按楼栋、容量、设备筛选，秒级反馈空闲时段',
+    desc: '按楼栋、容量、设备筛选教室，实时锁定空闲时段。',
     tag: '实时空闲',
+    to: '/classrooms',
     icon: 'M4 4h16v4H4V4zm0 6h16v10H4V10zm4 2v6h2v-6H8zm6 0v6h2v-6h-2z'
   },
   {
     title: '讲座报名',
-    desc: '查看讲座热度与报名进度，自动加入候补队列',
-    tag: '智能候补',
+    desc: '自动候补、签到与通知同步，报名状态一目了然。',
+    tag: '自动候补',
+    to: '/lectures',
     icon: 'M4 6h16v8H4V6zm3-3h10v2H7V3zm-1 13h12v2H6v-2z'
   },
   {
     title: '设备借用',
-    desc: '摄影器材、实验仪器、会议设备一键借还',
-    tag: '校内资源',
+    desc: '器材借用、审批与归还全流程闭环。',
+    tag: '审批闭环',
+    to: '/equipments',
     icon: 'M7 4h10l2 4v9a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V8l2-4zm1 6h8v2H8v-2z'
   },
   {
     title: '校车预约',
-    desc: '多校区班次与余位可视化，支持临时加班次',
-    tag: '出行保障',
+    desc: '班次余位可视化，支持候补与自动递补。',
+    tag: '余位可视',
+    to: '/bus/trips',
     icon: 'M5 6h14l1.5 4.5V16a2 2 0 0 1-2 2H17a2 2 0 0 1-2-2H9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-5.5L5 6zm1 5h12v3H6v-3z'
   },
   {
-    title: '场地审批',
-    desc: '活动申请联动审批流，材料缺失自动提醒',
-    tag: '跨部门协同',
+    title: '审批中心',
+    desc: '教室、设备、讲座等审批统一处理。',
+    tag: '流程统一',
+    to: '/approvals',
     icon: 'M6 4h9l3 3v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm0 6h12v2H6v-2zm0 4h12v2H6v-2z'
   },
   {
     title: '通知中心',
-    desc: '办事进度、提醒、消息分类聚合',
-    tag: '多端同步',
+    desc: '站内消息模板化，广播与提醒及时触达。',
+    tag: '模板化',
+    to: '/messages',
     icon: 'M12 4a5 5 0 0 1 5 5v4l2 2H5l2-2V9a5 5 0 0 1 5-5zm-3 14h6a3 3 0 0 1-6 0z'
-  }
-]
-
-const lectures = [
-  {
-    title: '人工智能伦理与校园治理',
-    room: '逸夫楼 210',
-    time: '周三 14:00-16:00',
-    tags: '人文讲堂'
-  },
-  {
-    title: '高校科研数据合规管理',
-    room: '信息中心 3F',
-    time: '周四 19:00-20:30',
-    tags: '科研支持'
-  },
-  {
-    title: '科研成果转化路径分享',
-    room: '创新中心 401',
-    time: '周五 15:00-17:00',
-    tags: '产学研'
   }
 ]
 
 const highlights = [
   {
     title: '分布式锁防冲突',
-    desc: '高并发预约场景自动加锁，保障名额公平可控'
+    desc: '高并发预约自动加锁，避免重复占用。'
   },
   {
-    title: '预约热度预测',
-    desc: '结合历史数据生成峰值预警与增量场地推荐'
+    title: '候补与自动递补',
+    desc: '讲座与校车候补自动转正，释放名额及时填补。'
   },
   {
     title: '审批链可视化',
-    desc: '不同部门节点与耗时一目了然，支持催办提醒'
+    desc: '审批流程清晰可追踪，支持及时提醒。'
   },
   {
-    title: '资源画像看板',
-    desc: '各楼栋利用率、讲座出勤率、设备周转率可追踪'
+    title: '消息模板驱动',
+    desc: '模板化通知减少重复沟通，触达更稳定。'
   }
 ]
+
+const loading = ref(false)
+const error = ref('')
+const overview = ref(null)
+const messages = ref([])
+const messageError = ref('')
+const loggedIn = computed(() => isLoggedIn())
+
+const load = async () => {
+  loading.value = true
+  error.value = ''
+  try {
+    overview.value = await request('/api/home/overview')
+  } catch (e) {
+    error.value = e.message || text.errors.load
+  } finally {
+    loading.value = false
+  }
+}
+
+const loadMessages = async () => {
+  if (!loggedIn.value) return
+  messageError.value = ''
+  try {
+    const data = await request('/api/messages')
+    messages.value = data.slice(0, 3)
+  } catch (e) {
+    messageError.value = e.message || text.notices.error
+  }
+}
+
+const summaryCards = computed(() => {
+  const data = overview.value || {}
+  return [
+    { label: text.summary.classroom, value: data.classroomCount || 0 },
+    { label: text.summary.equipment, value: data.equipmentCount || 0 },
+    { label: text.summary.lecture, value: data.lectureOpenCount || 0 },
+    { label: text.summary.bus, value: data.busTripOpenCount || 0 }
+  ]
+})
+
+const hotClassrooms = computed(() => (overview.value?.hotClassrooms || []))
+const upcomingLectures = computed(() => (overview.value?.upcomingLectures || []))
+
+const formatTime = (value) => {
+  if (!value) return '-'
+  return value.replace('T', ' ')
+}
+
+onMounted(async () => {
+  await load()
+  await loadMessages()
+})
 </script>
 
 <template>
   <MarketingLayout>
     <div class="page">
-    <section class="hero container">
-      <div class="hero-copy">
-        <span class="pill">综合服务平台 · 2026 春季版</span>
-        <h1>让校园预约更快、更稳、更可视</h1>
-        <p class="subtle">
-          从教室、讲座到设备与校车，统一入口、统一审核、统一消息，解决“多系统、多规则、多等待”。
-        </p>
-        <div class="hero-actions">
-          <RouterLink class="btn primary" to="/dashboard">进入预约</RouterLink>
-          <RouterLink class="btn ghost" to="/approvals">查看审批流</RouterLink>
-        </div>
-        <div class="hero-metrics">
-          <div>
-            <p class="metric-value">1.8 万</p>
-            <p class="metric-label">本周可预约时段</p>
+      <section class="hero container">
+        <div class="hero-copy">
+          <span class="pill">{{ text.badge }}</span>
+          <h1>{{ text.heroTitle }}</h1>
+          <p class="subtle">
+            {{ text.heroSub }}
+          </p>
+          <div class="hero-actions">
+            <RouterLink class="btn primary" to="/dashboard">{{ text.enterConsole }}</RouterLink>
+            <RouterLink class="btn ghost" to="/reservations/new">{{ text.startReservation }}</RouterLink>
           </div>
-          <div>
-            <p class="metric-value">97%</p>
-            <p class="metric-label">高峰成功率</p>
+          <div class="hero-metrics">
+            <div v-for="item in summaryCards" :key="item.label">
+              <p class="metric-value">{{ item.value }}</p>
+              <p class="metric-label">{{ item.label }}</p>
+            </div>
           </div>
-          <div>
-            <p class="metric-value">42 秒</p>
-            <p class="metric-label">平均审批响应</p>
+          <div v-if="overview" class="hero-badges">
+            <span class="tag">{{ text.badges.pendingApproval }} {{ overview.pendingApprovalCount || 0 }}</span>
+            <span class="tag">{{ text.badges.reservationPending }} {{ overview.reservationPendingCount || 0 }}</span>
           </div>
         </div>
-      </div>
 
-      <div class="hero-panel card">
-        <div class="panel-header">
-          <div>
-            <h3>今日热门场地</h3>
-            <p class="subtle">可预约时段实时更新</p>
-          </div>
-          <button class="btn ghost small">刷新</button>
-        </div>
-        <div class="panel-list">
-          <div class="panel-row">
+        <div class="hero-panel card">
+          <div class="panel-header">
             <div>
-              <p class="row-title">理科楼 A102</p>
-              <p class="row-sub">可容纳 120 人 · 投影/录播</p>
+              <h3>{{ text.hot.title }}</h3>
+              <p class="subtle">{{ text.hot.desc }}</p>
             </div>
-            <span class="row-tag">余 6</span>
+            <button class="btn ghost small" type="button" @click="load">{{ text.hot.refresh }}</button>
           </div>
-          <div class="panel-row">
-            <div>
-              <p class="row-title">图书馆多媒体室</p>
-              <p class="row-sub">可容纳 60 人 · 讨论模式</p>
+          <div class="panel-list" v-if="hotClassrooms.length">
+            <div v-for="item in hotClassrooms" :key="item.id" class="panel-row">
+              <div>
+                <p class="row-title">{{ item.building }} {{ item.roomNo }}</p>
+                <p class="row-sub">{{ text.hot.capacity }} {{ item.capacity || '-' }} ? {{ item.location || text.hot.locationEmpty }}</p>
+              </div>
+              <span class="row-tag">{{ item.reservationCount || 0 }} {{ text.hot.times }}</span>
             </div>
-            <span class="row-tag">余 3</span>
           </div>
-          <div class="panel-row">
+          <div v-else class="empty">{{ text.hot.empty }}</div>
+          <div class="panel-footer">
             <div>
-              <p class="row-title">创新中心 3F</p>
-              <p class="row-sub">可容纳 80 人 · 会议系统</p>
+              <p class="row-title">{{ text.hot.approvedTitle }}</p>
+              <p class="row-sub">{{ text.hot.approvedDesc }} {{ overview?.reservationApprovedCount || 0 }} {{ text.hot.approvedUnit }}</p>
             </div>
-            <span class="row-tag">余 9</span>
+            <span class="status-pill">{{ text.hot.status }}</span>
           </div>
         </div>
-        <div class="panel-footer">
-          <div>
-            <p class="row-title">系统状态</p>
-            <p class="row-sub">分布式锁已启用 · 峰值保护运行中</p>
-          </div>
-          <span class="status-pill">稳定</span>
-        </div>
-      </div>
-    </section>
+      </section>
 
-    <section id="services" class="container section">
-      <div class="section-title">
-        <h2>服务入口</h2>
-        <span>聚合 6 类高频业务</span>
-      </div>
-      <div class="service-grid">
-        <article v-for="service in services" :key="service.title" class="service-card card">
-          <div class="service-icon">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path :d="service.icon" fill="currentColor" />
-            </svg>
-          </div>
-          <div>
-            <div class="service-header">
-              <h3>{{ service.title }}</h3>
-              <span class="service-tag">{{ service.tag }}</span>
-            </div>
-            <p class="subtle">{{ service.desc }}</p>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <section id="lectures" class="container section split">
-      <div class="card lecture-card">
+      <section class="container section">
         <div class="section-title">
-          <h2>本周热门讲座</h2>
-          <span>报名人数实时同步</span>
+          <h2>{{ text.services.title }}</h2>
+          <span>{{ text.services.sub }}</span>
         </div>
-        <div class="lecture-list">
-          <div v-for="lecture in lectures" :key="lecture.title" class="lecture-row">
-            <div>
-              <p class="row-title">{{ lecture.title }}</p>
-              <p class="row-sub">{{ lecture.room }} · {{ lecture.time }}</p>
+        <div class="service-grid">
+          <RouterLink v-for="service in services" :key="service.title" :to="service.to" class="service-card card">
+            <div class="service-icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path :d="service.icon" fill="currentColor" />
+              </svg>
             </div>
-            <span class="lecture-tag">{{ lecture.tags }}</span>
-          </div>
+            <div>
+              <div class="service-header">
+                <h3>{{ service.title }}</h3>
+                <span class="service-tag">{{ service.tag }}</span>
+              </div>
+              <p class="subtle">{{ service.desc }}</p>
+            </div>
+          </RouterLink>
         </div>
-        <button class="btn ghost full">查看全部讲座</button>
-      </div>
+      </section>
 
-      <div class="card occupancy-card">
-        <div class="section-title">
-          <h2>场地实时占用</h2>
-          <span>07:00-23:00</span>
+      <section class="container section split">
+        <div class="card lecture-card">
+          <div class="section-title">
+            <h2>{{ text.lectures.title }}</h2>
+            <span>{{ text.lectures.sub }}</span>
+          </div>
+          <div v-if="upcomingLectures.length" class="lecture-list">
+            <div v-for="lecture in upcomingLectures" :key="lecture.id" class="lecture-row">
+              <div>
+                <p class="row-title">{{ lecture.title }}</p>
+                <p class="row-sub">{{ lecture.location || text.lectures.locationEmpty }} ? {{ formatTime(lecture.startTime) }}</p>
+              </div>
+              <span class="lecture-tag">{{ text.lectures.capacity }} {{ lecture.capacity }}</span>
+            </div>
+          </div>
+          <div v-else class="empty">{{ text.lectures.empty }}</div>
+          <RouterLink class="btn ghost full" to="/lectures">{{ text.lectures.viewAll }}</RouterLink>
         </div>
-        <div class="occupancy-item">
-          <div class="occupancy-header">
-            <p>教学楼 A 区</p>
-            <span>78%</span>
-          </div>
-          <div class="bar">
-            <span style="width: 78%"></span>
-          </div>
-        </div>
-        <div class="occupancy-item">
-          <div class="occupancy-header">
-            <p>图书馆</p>
-            <span>62%</span>
-          </div>
-          <div class="bar">
-            <span style="width: 62%"></span>
-          </div>
-        </div>
-        <div class="occupancy-item">
-          <div class="occupancy-header">
-            <p>创新中心</p>
-            <span>54%</span>
-          </div>
-          <div class="bar">
-            <span style="width: 54%"></span>
-          </div>
-        </div>
-        <div class="occupancy-item">
-          <div class="occupancy-header">
-            <p>体育馆</p>
-            <span>41%</span>
-          </div>
-          <div class="bar">
-            <span style="width: 41%"></span>
-          </div>
-        </div>
-      </div>
-    </section>
 
-    <section class="container section split">
-      <div class="card highlight-card">
-        <div class="section-title">
-          <h2>系统亮点</h2>
-          <span>高并发保障与智能调度</span>
-        </div>
-        <div class="highlight-grid">
-          <div v-for="highlight in highlights" :key="highlight.title" class="highlight-item">
-            <h4>{{ highlight.title }}</h4>
-            <p class="subtle">{{ highlight.desc }}</p>
+        <div class="card highlight-card">
+          <div class="section-title">
+            <h2>{{ text.highlights.title }}</h2>
+            <span>{{ text.highlights.sub }}</span>
+          </div>
+          <div class="highlight-grid">
+            <div v-for="highlight in highlights" :key="highlight.title" class="highlight-item">
+              <h4>{{ highlight.title }}</h4>
+              <p class="subtle">{{ highlight.desc }}</p>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div class="card notice-card">
-        <div class="section-title">
-          <h2>通知中心</h2>
-          <span>最近 24 小时</span>
-        </div>
-        <div class="notice-list">
-          <div class="notice-row">
-            <div>
-              <p class="row-title">场地审批已通过</p>
-              <p class="row-sub">社团联合活动 · 创新中心 3F</p>
-            </div>
-            <span class="notice-time">5 分钟前</span>
+      <section class="container section">
+        <div class="card notice-card">
+          <div class="section-title">
+            <h2>{{ text.notices.title }}</h2>
+            <span>{{ text.notices.sub }}</span>
           </div>
-          <div class="notice-row">
-            <div>
-              <p class="row-title">讲座报名提醒</p>
-              <p class="row-sub">AI 伦理讲堂 · 还剩 12 个名额</p>
-            </div>
-            <span class="notice-time">2 小时前</span>
+          <div v-if="!loggedIn" class="empty">
+            {{ text.notices.login }}
+            <RouterLink class="btn ghost full" to="/login">{{ text.notices.goLogin }}</RouterLink>
           </div>
-          <div class="notice-row">
-            <div>
-              <p class="row-title">设备归还确认</p>
-              <p class="row-sub">摄影器材 · 已完成消毒</p>
+          <div v-else>
+            <p v-if="messageError" class="error">{{ messageError }}</p>
+            <div v-if="messages.length" class="notice-list">
+              <div v-for="item in messages" :key="item.id" class="notice-row">
+                <div>
+                  <p class="row-title">{{ item.title }}</p>
+                  <p class="row-sub">{{ item.content }}</p>
+                </div>
+                <span class="notice-time">{{ formatTime(item.createdAt) }}</span>
+              </div>
             </div>
-            <span class="notice-time">昨天</span>
+            <div v-else class="empty">{{ text.notices.empty }}</div>
+            <RouterLink class="btn ghost full" to="/messages">{{ text.notices.view }}</RouterLink>
           </div>
         </div>
-        <button class="btn ghost full">进入消息中心</button>
-      </div>
-    </section>
+      </section>
+
+      <div v-if="error" class="container error-banner">{{ error }}</div>
     </div>
   </MarketingLayout>
 </template>
@@ -314,8 +352,8 @@ const highlights = [
 
 .hero-metrics {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
   margin-top: 28px;
 }
 
@@ -327,6 +365,12 @@ const highlights = [
 .metric-label {
   font-size: 13px;
   color: var(--text-muted);
+}
+
+.hero-badges {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
 }
 
 .hero-panel {
@@ -458,7 +502,6 @@ const highlights = [
 }
 
 .lecture-card,
-.occupancy-card,
 .highlight-card,
 .notice-card {
   padding: 20px;
@@ -499,33 +542,6 @@ const highlights = [
   margin-top: 12px;
 }
 
-.occupancy-item {
-  display: grid;
-  gap: 8px;
-  margin-bottom: 16px;
-}
-
-.occupancy-header {
-  display: flex;
-  justify-content: space-between;
-  font-size: 14px;
-  color: var(--text-muted);
-}
-
-.bar {
-  height: 8px;
-  background: #e2e8f0;
-  border-radius: 999px;
-  overflow: hidden;
-}
-
-.bar span {
-  display: block;
-  height: 100%;
-  background: linear-gradient(90deg, #1d4ed8, #0ea5e9);
-  border-radius: inherit;
-}
-
 .highlight-grid {
   display: grid;
   gap: 16px;
@@ -547,6 +563,24 @@ const highlights = [
   font-size: 12px;
 }
 
+.empty {
+  padding: 16px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-light);
+  text-align: center;
+}
+
+.error {
+  color: #dc2626;
+  font-size: 13px;
+}
+
+.error-banner {
+  margin-top: 16px;
+  color: #dc2626;
+}
+
 @media (max-width: 1024px) {
   .hero,
   .split {
@@ -554,7 +588,7 @@ const highlights = [
   }
 
   .hero-metrics {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .service-grid {

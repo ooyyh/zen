@@ -31,5 +31,7 @@ build/
 .claude
 .codex
 .gemini
+CLAUDE.md
+AGENTS.md
 ### VS Code ###
 .vscode/

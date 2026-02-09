@@ -31,4 +31,6 @@ public interface ReservationMapper {
     int countAll();
 
     int countByStatus(@Param("status") String status);
+
+    java.util.List<com.hbnu.zen.dto.HomeClassroomHot> selectHotClassrooms(@Param("limit") int limit);
 }

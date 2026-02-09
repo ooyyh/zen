@@ -46,4 +46,15 @@
     <select id="countAll" resultType="int">
         select count(1) from lecture
     </select>
+
+    <select id="countByStatus" resultType="int">
+        select count(1) from lecture where status = #{status}
+    </select>
+
+    <select id="selectUpcomingOpen" resultMap="LectureMap">
+        select * from lecture
+        where status = 'OPEN' and start_time &gt;= #{now}
+        order by start_time asc
+        limit #{limit}
+    </select>
 </mapper>

@@ -18,7 +18,8 @@ import java.util.Set;
 @Component
 public class AuthInterceptor implements HandlerInterceptor {
     private static final Set<String> EXCLUDES = new HashSet<>(Arrays.asList(
-            "/api/auth/login"
+            "/api/auth/login",
+            "/api/home/overview"
     ));
 
     private final JwtUtil jwtUtil;

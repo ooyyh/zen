@@ -96,6 +96,24 @@ const router = createRouter({
       meta: { title: '我的校车', parent: '校车管理' }
     },
     {
+      path: '/study-rooms',
+      name: 'study-rooms',
+      component: () => import('../views/StudyRoomListView.vue'),
+      meta: { title: '自习室抢座', parent: '自习管理' }
+    },
+    {
+      path: '/study-rooms/:id/seats',
+      name: 'seat-selection',
+      component: () => import('../views/SeatSelectionView.vue'),
+      meta: { title: '选择座位', parent: '自习管理' }
+    },
+    {
+      path: '/seat-reservations/my',
+      name: 'seat-reservations-my',
+      component: () => import('../views/SeatReservationListView.vue'),
+      meta: { title: '我的座位', parent: '自习管理' }
+    },
+    {
       path: '/admin/reports',
       name: 'admin-reports',
       component: () => import('../views/AdminReportView.vue'),
@@ -172,6 +190,24 @@ const router = createRouter({
       name: 'admin-config',
       component: () => import('../views/AdminConfigView.vue'),
       meta: { title: '规则配置', parent: '后台管理', admin: true }
+    },
+    {
+      path: '/admin/study-rooms',
+      name: 'admin-study-rooms',
+      component: () => import('../views/AdminStudyRoomView.vue'),
+      meta: { title: '自习室管理', parent: '后台管理', admin: true }
+    },
+    {
+      path: '/admin/study-rooms/:id/seats',
+      name: 'admin-seat-management',
+      component: () => import('../views/AdminSeatManagementView.vue'),
+      meta: { title: '座位管理', parent: '后台管理', admin: true }
+    },
+    {
+      path: '/admin/seat-reservations',
+      name: 'admin-seat-reservations',
+      component: () => import('../views/AdminSeatReservationView.vue'),
+      meta: { title: '座位预约记录', parent: '后台管理', admin: true }
     }
   ]
 })

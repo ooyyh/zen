@@ -17,4 +17,9 @@ public interface LectureMapper {
     List<Lecture> selectAll(@Param("status") String status);
 
     int countAll();
+
+    int countByStatus(@Param("status") String status);
+
+    List<Lecture> selectUpcomingOpen(@Param("now") java.time.LocalDateTime now,
+                                     @Param("limit") int limit);
 }

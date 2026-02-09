@@ -9,7 +9,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   redis:
     host: 59.110.93.61
-    port: 6379
+    port: 6379  
   sql:
     init:
       mode: always
@@ -36,5 +36,8 @@ app:
     lock-wait-ms: 800
     lock-lease-ms: 5000
   bus:
+    lock-wait-ms: 800
+    lock-lease-ms: 5000
+  seat:
     lock-wait-ms: 800
     lock-lease-ms: 5000

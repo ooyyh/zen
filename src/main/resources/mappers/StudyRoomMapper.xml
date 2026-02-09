@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hbnu.zen.mapper.StudyRoomMapper">
+    <select id="selectAll" resultType="StudyRoom">
+        SELECT * FROM study_room WHERE status = 1 ORDER BY building, floor
+    </select>
+
+    <select id="selectById" resultType="StudyRoom">
+        SELECT * FROM study_room WHERE id = #{id} AND status = 1
+    </select>
+
+    <select id="selectAvailableViews" resultType="com.hbnu.zen.dto.StudyRoomView">
+        SELECT
+            sr.id,
+            sr.name,
+            sr.building,
+            sr.floor,
+            sr.area,
+            sr.total_seats AS totalSeats,
+            (sr.total_seats - COALESCE(reserved.cnt, 0)) AS availableSeats
+        FROM study_room sr
+        LEFT JOIN (
+            SELECT s.study_room_id, COUNT(*) AS cnt
+            FROM seat s
+            INNER JOIN seat_reservation res ON res.seat_id = s.id
+            WHERE res.status IN ('RESERVED', 'CHECKED_IN')
+              AND res.start_time &lt; #{endTime}
+              AND res.end_time &gt; #{startTime}
+            GROUP BY s.study_room_id
+        ) reserved ON reserved.study_room_id = sr.id
+        WHERE sr.status = 1
+        ORDER BY sr.building, sr.floor
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO study_room (name, building, floor, area, total_seats, status)
+        VALUES (#{name}, #{building}, #{floor}, #{area}, #{totalSeats}, 1)
+    </insert>
+
+    <update id="update">
+        UPDATE study_room
+        SET name = #{name}, building = #{building}, floor = #{floor},
+            area = #{area}, total_seats = #{totalSeats}, updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateStatus">
+        UPDATE study_room SET status = #{status}, updated_at = NOW() WHERE id = #{id}
+    </update>
+</mapper>

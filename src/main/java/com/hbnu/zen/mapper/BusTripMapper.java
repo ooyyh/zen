@@ -20,4 +20,6 @@ public interface BusTripMapper {
     List<BusTripView> selectViews(@Param("status") String status);
 
     int countAll();
+
+    int countByStatus(@Param("status") String status);
 }

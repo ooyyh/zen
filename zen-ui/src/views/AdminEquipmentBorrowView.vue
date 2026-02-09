@@ -1,10 +1,13 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import AppShell from '@/components/AppShell.vue'
+import ReasonDialog from '@/components/ReasonDialog.vue'
 import { request } from '@/services/api'
 
 const list = ref([])
 const error = ref('')
+const showReasonDialog = ref(false)
+const currentItem = ref(null)
 
 const load = async () => {
   error.value = ''
@@ -15,13 +18,29 @@ const load = async () => {
   }
 }
 
-const handle = async (item, action) => {
-  const remark = action === 'reject' ? prompt('请输入驳回原因') : ''
-  if (action === 'reject' && remark === null) return
+const handleApprove = async (item) => {
   try {
-    await request(`/api/admin/equipments/borrows/${item.id}/${action}`, {
+    await request(`/api/admin/equipments/borrows/${item.id}/approve`, {
       method: 'POST',
-      body: JSON.stringify({ remark })
+      body: JSON.stringify({ remark: '' })
+    })
+    await load()
+  } catch (e) {
+    alert(e.message || '操作失败')
+  }
+}
+
+const handleReject = (item) => {
+  currentItem.value = item
+  showReasonDialog.value = true
+}
+
+const confirmReject = async (reason) => {
+  if (!currentItem.value) return
+  try {
+    await request(`/api/admin/equipments/borrows/${currentItem.value.id}/reject`, {
+      method: 'POST',
+      body: JSON.stringify({ remark: reason })
     })
     await load()
   } catch (e) {
@@ -55,14 +74,21 @@ onMounted(load)
             <td>{{ item.reason || '-' }}</td>
             <td><span class="tag">{{ item.status }}</span></td>
             <td class="actions">
-              <button class="btn primary" @click="handle(item, 'approve')">通过</button>
-              <button class="btn ghost" @click="handle(item, 'reject')">驳回</button>
+              <button class="btn primary" @click="handleApprove(item)">通过</button>
+              <button class="btn ghost" @click="handleReject(item)">驳回</button>
             </td>
           </tr>
         </tbody>
       </table>
       <div v-if="!list.length" class="empty">暂无待审批申请</div>
     </div>
+
+    <ReasonDialog
+      v-model="showReasonDialog"
+      title="请输入驳回原因"
+      placeholder="请详细说明驳回原因..."
+      @confirm="confirmReject"
+    />
   </AppShell>
 </template>
 

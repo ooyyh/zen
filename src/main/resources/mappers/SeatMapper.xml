@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hbnu.zen.mapper.SeatMapper">
+    <select id="selectByRoomId" resultType="Seat">
+        SELECT * FROM seat WHERE study_room_id = #{roomId} AND status = 1 ORDER BY seat_no
+    </select>
+
+    <select id="selectById" resultType="Seat">
+        SELECT * FROM seat WHERE id = #{id} AND status = 1
+    </select>
+
+    <select id="selectAvailableSeats" resultType="com.hbnu.zen.dto.SeatView">
+        SELECT
+            s.id,
+            s.study_room_id AS studyRoomId,
+            s.seat_no AS seatNo,
+            s.seat_type AS seatType,
+            s.has_power AS hasPower,
+            CASE WHEN res.id IS NOT NULL THEN 1 ELSE 0 END AS reserved
+        FROM seat s
+        LEFT JOIN seat_reservation res
+            ON res.seat_id = s.id
+            AND res.status IN
+            <foreach collection="blockingStatuses" item="status" open="(" separator="," close=")">
+                #{status}
+            </foreach>
+            AND res.start_time &lt; #{endTime}
+            AND res.end_time &gt; #{startTime}
+        WHERE s.study_room_id = #{roomId} AND s.status = 1
+        ORDER BY s.seat_no
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO seat (study_room_id, seat_no, seat_type, has_power, position_x, position_y, status)
+        VALUES (#{studyRoomId}, #{seatNo}, #{seatType}, #{hasPower}, #{positionX}, #{positionY}, 1)
+    </insert>
+
+    <update id="update">
+        UPDATE seat
+        SET seat_no = #{seatNo}, seat_type = #{seatType}, has_power = #{hasPower}, 
+            position_x = #{positionX}, position_y = #{positionY}, updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateStatus">
+        UPDATE seat SET status = #{status}, updated_at = NOW() WHERE id = #{id}
+    </update>
+</mapper>
