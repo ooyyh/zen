@@ -1,0 +1,69 @@
+@startuml ?????
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam cloud {
+  BackgroundColor #ECFEFF
+  BorderColor #0891B2
+}
+skinparam node {
+  BackgroundColor #F8FAFC
+  BorderColor #334155
+}
+
+title Zen Campus ???????? - ?????
+
+cloud "????" as Users {
+  [PC ???] as PC
+  [??????] as Mobile
+}
+
+node "???" as Access {
+  [Nginx ????] as Nginx
+}
+
+node "????" as Frontend {
+  [Vue Dist ????] as VueDist
+}
+
+node "???" as Backend {
+  [Spring Boot ?? #1] as App1
+  [Spring Boot ?? #2 (???)] as App2
+}
+
+node "???" as Data {
+  database "MySQL (zen)" as Mysql
+  [Redis (?/???)] as Redis
+}
+
+node "??????" as Realtime {
+  [WebSocket STOMP Broker] as WsBroker
+}
+
+node "???" as Ops {
+  [????] as Logs
+  [????(???)] as Monitor
+}
+
+Users --> Nginx : HTTPS
+Nginx --> VueDist : ????
+Nginx --> App1 : /api/*
+Nginx --> App2 : /api/*
+
+App1 --> Mysql
+App2 --> Mysql
+App1 --> Redis
+App2 --> Redis
+App1 --> WsBroker
+App2 --> WsBroker
+
+App1 --> Logs
+App2 --> Logs
+Mysql --> Logs
+Redis --> Logs
+Logs --> Monitor
+
+note bottom
+  ?????????????????????????
+end note
+
+@enduml

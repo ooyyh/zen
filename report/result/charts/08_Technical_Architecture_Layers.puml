@@ -1,0 +1,89 @@
+@startuml ???????
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam package {
+  BackgroundColor #F8FAFC
+  BorderColor #334155
+}
+
+title Zen Campus ???????? - ???????
+
+package "L1 ??? (Presentation)" as L1 {
+  [Vue 3 + Vite] as V1
+  [Router + AppShell] as V2
+  [ECharts ???] as V3
+  [STOMP ???] as V4
+}
+
+package "L2 ??? (Controller)" as L2 {
+  [AuthController] as C1
+  [ReservationController] as C2
+  [LectureController] as C3
+  [EquipmentController] as C4
+  [BusController] as C5
+  [StudyRoomController] as C6
+  [Admin*Controller] as C7
+}
+
+package "L3 ??? (Service)" as L3 {
+  [UserService] as S1
+  [ReservationService] as S2
+  [LectureService] as S3
+  [EquipmentBorrowService] as S4
+  [BusBookingService] as S5
+  [SeatReservationService] as S6
+  [MessageService / ReportService] as S7
+}
+
+package "L4 ????? (Data Access)" as L4 {
+  [MyBatis Mapper ??] as D1
+  [Mapper XML SQL] as D2
+}
+
+package "L5 ????? (Infrastructure)" as L5 {
+  [MySQL] as I1
+  [Redis + Redisson] as I2
+  [WebSocket Broker] as I3
+  [JWT + AuthInterceptor] as I4
+}
+
+V1 --> C1
+V2 --> C2
+V3 --> C7
+V4 --> C6
+
+C1 --> S1
+C2 --> S2
+C3 --> S3
+C4 --> S4
+C5 --> S5
+C6 --> S6
+C7 --> S7
+
+S1 --> D1
+S2 --> D1
+S3 --> D1
+S4 --> D1
+S5 --> D1
+S6 --> D1
+S7 --> D1
+
+D1 --> D2
+D2 --> I1
+S2 --> I2
+S3 --> I2
+S4 --> I2
+S5 --> I2
+S6 --> I2
+S6 --> I3
+C1 --> I4
+
+note right of L3
+  ??????
+  - ????
+  - ????
+  - ??????
+  - ??????
+end note
+
+@enduml

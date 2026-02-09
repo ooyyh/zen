@@ -1,0 +1,110 @@
+@startuml ?????
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam componentStyle rectangle
+
+title Zen Campus ???????? - ?????
+
+package "???? (Client Layer)" {
+  [PC ???] as Browser
+  [??????] as Mobile
+}
+
+package "??? (Frontend Layer)" {
+  [Vue 3 ??] as VueApp
+  [Vue Router] as Router
+  [ECharts ??] as ECharts
+  [STOMP WebSocket ???] as StompClient
+  [Fetch API ??] as FetchApi
+}
+
+package "?????? (Network Layer)" {
+  [HTTP/HTTPS REST] as HttpRest
+  [WebSocket /ws] as Ws
+  [JWT Bearer Token] as JwtToken
+}
+
+package "????? (Backend Layer)" {
+  [Spring Boot] as SpringBoot
+  [AuthInterceptor] as AuthInterceptor
+  [GlobalExceptionHandler] as ExceptionHandler
+  [WebSocketConfig] as WsConfig
+}
+
+package "????? (Service Layer)" {
+  [ReservationService] as ReservationService
+  [LectureService] as LectureService
+  [EquipmentBorrowService] as EquipmentBorrowService
+  [BusBookingService] as BusBookingService
+  [SeatReservationService] as SeatReservationService
+  [MessageService] as MessageService
+  [ReportService] as ReportService
+}
+
+package "????? (Data Access Layer)" {
+  [MyBatis Mapper] as Mapper
+  [SQL Mapper XML] as MapperXml
+}
+
+package "????? (Infrastructure Layer)" {
+  database "MySQL (zen)" as Mysql
+  [Redis + Redisson] as Redis
+  [STOMP Broker (/topic)] as Broker
+}
+
+Browser --> VueApp
+Mobile --> VueApp
+VueApp --> Router
+VueApp --> ECharts
+VueApp --> FetchApi
+VueApp --> StompClient
+
+FetchApi --> HttpRest
+HttpRest --> SpringBoot
+StompClient --> Ws
+Ws --> WsConfig
+
+HttpRest --> JwtToken
+JwtToken --> AuthInterceptor
+SpringBoot --> ExceptionHandler
+
+SpringBoot --> ReservationService
+SpringBoot --> LectureService
+SpringBoot --> EquipmentBorrowService
+SpringBoot --> BusBookingService
+SpringBoot --> SeatReservationService
+SpringBoot --> MessageService
+SpringBoot --> ReportService
+
+ReservationService --> Mapper
+LectureService --> Mapper
+EquipmentBorrowService --> Mapper
+BusBookingService --> Mapper
+SeatReservationService --> Mapper
+MessageService --> Mapper
+ReportService --> Mapper
+
+Mapper --> MapperXml
+MapperXml --> Mysql
+ReservationService --> Redis
+LectureService --> Redis
+EquipmentBorrowService --> Redis
+BusBookingService --> Redis
+SeatReservationService --> Redis
+SeatReservationService --> Broker
+
+note right of Redis
+  **??????**
+  - ????: lock:* ???
+  - ????: seat:pending:* TTL
+end note
+
+note right of SpringBoot
+  **?????**
+  - Spring Boot 2.6.13
+  - MyBatis + XML Mapper
+  - JWT + ?????
+  - WebSocket(STOMP)
+end note
+
+@enduml

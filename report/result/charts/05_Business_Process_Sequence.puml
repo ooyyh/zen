@@ -1,0 +1,55 @@
+@startuml ???????
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam sequence {
+  ArrowColor #1D4ED8
+  LifeLineBackgroundColor #E0F2FE
+  LifeLineBorderColor #0EA5E9
+}
+
+title Zen Campus ???????? - ????????
+
+actor "??" as Student
+participant "?? SeatSelectionView" as Frontend
+participant "SeatStatusController" as SeatStatusController
+participant "SeatReservationService" as SeatService
+participant "Redis/Redisson" as Redis
+participant "MySQL" as Mysql
+participant "WebSocket /topic/seat-status" as WsTopic
+participant "MessageService" as MsgService
+
+== 1. ?????? ==
+Student -> Frontend: ????
+Frontend -> SeatStatusController: POST /api/seat-status/pending/{seatId}
+SeatStatusController -> SeatService: markSeatPending(seatId, userId)
+SeatService -> Redis: SET seat:pending:{seatId}=userId TTL 30s
+SeatService -> WsTopic: ?? seat=PENDING
+WsTopic --> Frontend: ??????
+
+== 2. ?????? ==
+Student -> Frontend: ??????
+Frontend -> SeatService: POST /api/study-rooms/seats/{seatId}/reserve
+SeatService -> Redis: tryLock(lock:seat:{seatId})
+alt ?????
+  SeatService -> Mysql: ??????
+  alt ???
+    SeatService -> Mysql: INSERT seat_reservation(status=RESERVED)
+    SeatService -> WsTopic: ?? seat=RESERVED
+    SeatService -> MsgService: sendTemplate(SEAT_RESERVED)
+    SeatService -> Redis: unlock(lock:seat:{seatId})
+    SeatService --> Frontend: ??????
+  else ???
+    SeatService -> Redis: unlock(lock:seat:{seatId})
+    SeatService --> Frontend: ??????
+  end
+else ?????
+  SeatService --> Frontend: ??????????
+end
+
+== 3. ?????? ==
+Student -> Frontend: ????/????
+Frontend -> SeatStatusController: POST /api/seat-status/release/{seatId}
+SeatService -> Redis: DEL seat:pending:{seatId}
+SeatService -> WsTopic: ?? seat=AVAILABLE
+
+@enduml

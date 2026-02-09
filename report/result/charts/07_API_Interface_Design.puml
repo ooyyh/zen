@@ -1,0 +1,95 @@
+@startuml API?????
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam package {
+  BackgroundColor #FFF7ED
+  BorderColor #C2410C
+}
+skinparam component {
+  BackgroundColor #EFF6FF
+  BorderColor #1D4ED8
+}
+
+title Zen Campus ???????? - API ?????
+
+package "?????" as AuthApi {
+  [POST /api/auth/login] as A1
+  [POST /api/auth/register] as A2
+  [POST /api/auth/me] as A3
+  [GET /api/user/profile] as A4
+  [GET /api/admin/users] as A5
+  [POST /api/admin/users] as A6
+}
+
+package "???????" as ReservationApi {
+  [GET /api/classrooms] as R1
+  [POST /api/reservations] as R2
+  [GET /api/reservations/my] as R3
+  [GET /api/reservations/{id}/timeline] as R4
+  [POST /api/admin/approvals/{id}/approve] as R5
+  [POST /api/admin/approvals/{id}/reject] as R6
+}
+
+package "????" as LectureApi {
+  [GET /api/lectures] as L1
+  [POST /api/lectures/{id}/signup] as L2
+  [POST /api/lectures/{id}/cancel] as L3
+  [POST /api/lectures/{id}/checkin] as L4
+  [GET /api/admin/lectures] as L5
+  [POST /api/admin/lectures] as L6
+}
+
+package "????" as EquipmentApi {
+  [GET /api/equipments] as E1
+  [POST /api/equipments/{id}/borrow] as E2
+  [POST /api/equipments/borrows/{id}/return] as E3
+  [GET /api/admin/equipments] as E4
+  [POST /api/admin/equipments/borrows/{id}/approve] as E5
+  [POST /api/admin/equipments/borrows/{id}/reject] as E6
+}
+
+package "????" as BusApi {
+  [GET /api/bus/trips] as B1
+  [POST /api/bus/trips/{id}/book] as B2
+  [POST /api/bus/bookings/{id}/cancel] as B3
+  [GET /api/admin/bus/routes] as B4
+  [POST /api/admin/bus/trips] as B5
+  [GET /api/admin/bus/bookings] as B6
+}
+
+package "?????" as SeatApi {
+  [GET /api/study-rooms] as S1
+  [GET /api/study-rooms/{id}/seats] as S2
+  [POST /api/study-rooms/seats/{id}/reserve] as S3
+  [POST /api/seat-status/pending/{seatId}] as S4
+  [POST /api/seat-status/release/{seatId}] as S5
+  [GET /api/admin/study-rooms/{roomId}/seats] as S6
+}
+
+package "?????" as OpsApi {
+  [GET /api/messages] as M1
+  [POST /api/messages/{id}/read] as M2
+  [GET /api/admin/message-templates] as M3
+  [POST /api/admin/messages/broadcast] as M4
+  [GET /api/admin/reports/overview] as M5
+  [GET /api/dashboard/summary] as M6
+  [GET /api/admin/config/reservation-rules] as M7
+  [PUT /api/admin/config/reservation-rules] as M8
+}
+
+AuthApi --> ReservationApi
+AuthApi --> LectureApi
+AuthApi --> EquipmentApi
+AuthApi --> BusApi
+AuthApi --> SeatApi
+ReservationApi --> OpsApi
+LectureApi --> OpsApi
+EquipmentApi --> OpsApi
+BusApi --> OpsApi
+SeatApi --> OpsApi
+
+note bottom
+  ???????? ApiResponse(code, message, data)?
+end note
+
+@enduml
