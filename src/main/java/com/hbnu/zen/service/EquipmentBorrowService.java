@@ -57,11 +57,6 @@ public class EquipmentBorrowService {
         if (request.getEndTime().isBefore(request.getStartTime()) || request.getEndTime().isEqual(request.getStartTime())) {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "结束时间必须晚于开始时间");
         }
-        // 允许5分钟的时间误差（考虑时区转换和网络延迟）
-        LocalDateTime minStartTime = LocalDateTime.now().minusMinutes(5);
-        if (request.getStartTime().isBefore(minStartTime)) {
-            throw new BusinessException(ErrorCode.BAD_REQUEST, "开始时间不能早于当前时间");
-        }
 
         String lockKey = "lock:equipment:" + equipmentId;
         RLock lock = redissonClient.getLock(lockKey);

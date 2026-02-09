@@ -17,6 +17,8 @@
             s.seat_no AS seatNo,
             s.seat_type AS seatType,
             s.has_power AS hasPower,
+            s.position_x AS positionX,
+            s.position_y AS positionY,
             CASE WHEN res.id IS NOT NULL THEN 1 ELSE 0 END AS reserved
         FROM seat s
         LEFT JOIN seat_reservation res

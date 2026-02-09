@@ -9,5 +9,7 @@ public class SeatView {
     private String seatNo;
     private String seatType;
     private Integer hasPower;
+    private Integer positionX;
+    private Integer positionY;
     private Boolean reserved;
 }

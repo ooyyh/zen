@@ -46,6 +46,23 @@ public class AuthController {
         return ApiResponse.success(toView(user));
     }
 
+    @PostMapping("/register")
+    public ApiResponse<LoginResponse> register(@Validated @RequestBody com.hbnu.zen.dto.RegisterRequest request) {
+        User user = userService.register(
+            request.getUsername(), 
+            request.getPassword(), 
+            request.getRole(),
+            request.getRealName()
+        );
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("uid", user.getId());
+        claims.put("username", user.getUsername());
+        claims.put("role", user.getRole());
+        String token = jwtUtil.generateToken(claims);
+        LoginResponse response = new LoginResponse(token, toView(user));
+        return ApiResponse.success(response);
+    }
+
     private UserView toView(User user) {
         UserView view = new UserView();
         view.setId(user.getId());

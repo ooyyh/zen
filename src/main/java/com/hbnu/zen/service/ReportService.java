@@ -42,7 +42,12 @@ public class ReportService {
         overview.setReservationPending(reservationMapper.countByStatus(ReservationStatus.PENDING_APPROVAL));
         overview.setReservationRejected(reservationMapper.countByStatus(ReservationStatus.REJECTED));
         overview.setEquipmentBorrowTotal(equipmentBorrowMapper.countAll());
-        overview.setEquipmentBorrowApproved(equipmentBorrowMapper.countByStatus(EquipmentBorrowStatus.APPROVED));
+        
+        // Count approved + returned as "approved" for report purposes
+        int equipmentApproved = equipmentBorrowMapper.countByStatus(EquipmentBorrowStatus.APPROVED);
+        int equipmentReturned = equipmentBorrowMapper.countByStatus(EquipmentBorrowStatus.RETURNED);
+        overview.setEquipmentBorrowApproved(equipmentApproved + equipmentReturned);
+        
         overview.setEquipmentBorrowPending(equipmentBorrowMapper.countByStatus(EquipmentBorrowStatus.PENDING));
         overview.setLectureTotal(lectureMapper.countAll());
         overview.setLectureSignupTotal(lectureSignupMapper.countAll());

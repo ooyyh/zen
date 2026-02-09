@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch, nextTick } from 'vue'
+import { ref, onMounted, watch, nextTick, computed } from 'vue'
 
 const props = defineProps({
   modelValue: Array, // 座位数组
@@ -14,6 +14,10 @@ const props = defineProps({
   canvasHeight: {
     type: Number,
     default: 600
+  },
+  defaultPrefix: {
+    type: String,
+    default: 'A'
   }
 })
 
@@ -29,7 +33,7 @@ const dragOffset = ref({ x: 0, y: 0 })
 // 网格模式参数
 const gridRows = ref(5)
 const gridCols = ref(10)
-const seatPrefix = ref('A')
+const seatPrefix = ref(props.defaultPrefix)
 
 // 座位样式
 const SEAT_SIZE = 40
@@ -48,6 +52,8 @@ onMounted(() => {
     if (props.modelValue && props.modelValue.length > 0) {
       seats.value = [...props.modelValue]
     }
+    // 使用传入的默认前缀
+    seatPrefix.value = props.defaultPrefix
     draw()
   }
 })
@@ -58,6 +64,23 @@ watch(() => props.modelValue, (newVal) => {
     draw()
   }
 }, { deep: true })
+
+// 监听默认前缀变化
+watch(() => props.defaultPrefix, (newVal) => {
+  if (newVal) {
+    seatPrefix.value = newVal
+  }
+})
+
+// 座位编号输入框（手动模式下可编辑）
+const editingSeatNo = ref(null)
+
+// 检测重名
+const duplicateSeatNos = computed(() => {
+  const seatNos = seats.value.map(s => s.seatNo)
+  const duplicates = seatNos.filter((no, index) => seatNos.indexOf(no) !== index)
+  return [...new Set(duplicates)]
+})
 
 // 网格模式：自动生成座位
 const generateGrid = () => {
@@ -120,6 +143,20 @@ const togglePower = () => {
   }
 }
 
+// 修改座位编号
+const changeSeatNo = () => {
+  if (selectedSeat.value !== null) {
+    const currentNo = seats.value[selectedSeat.value].seatNo
+    const newNo = prompt('请输入新的座位编号：', currentNo)
+    if (newNo && newNo.trim() && newNo !== currentNo) {
+      seats.value[selectedSeat.value].seatNo = newNo.trim()
+      emit('update:modelValue', seats.value)
+      emit('change', seats.value)
+      draw()
+    }
+  }
+}
+
 // 清空所有座位
 const clearAll = () => {
   if (confirm('确认清空所有座位？')) {
@@ -157,7 +194,8 @@ const draw = () => {
   // 绘制座位
   seats.value.forEach((seat, index) => {
     const isSelected = selectedSeat.value === index
-    const color = isSelected ? COLORS.seatSelected : COLORS.seat
+    const isDuplicate = duplicateSeatNos.value.includes(seat.seatNo)
+    const color = isDuplicate ? '#dc2626' : (isSelected ? COLORS.seatSelected : COLORS.seat)
     
     // 座位矩形
     ctx.value.fillStyle = color
@@ -255,7 +293,7 @@ onMounted(() => {
           </label>
           <label>
             编号前缀
-            <input v-model="seatPrefix" type="text" maxlength="3" placeholder="A" />
+            <input v-model="seatPrefix" type="text" maxlength="10" :placeholder="defaultPrefix" />
           </label>
           <button class="btn primary" @click="generateGrid">生成座位</button>
         </div>
@@ -265,6 +303,7 @@ onMounted(() => {
         <h3>手动拖拽模式</h3>
         <div class="button-row">
           <button class="btn primary" @click="addSeat">添加座位</button>
+          <button class="btn ghost" @click="changeSeatNo" :disabled="selectedSeat === null">修改编号</button>
           <button class="btn ghost" @click="togglePower" :disabled="selectedSeat === null">
             {{ selectedSeat !== null && seats[selectedSeat]?.hasPower ? '移除电源' : '添加电源' }}
           </button>
@@ -276,6 +315,9 @@ onMounted(() => {
       <div class="info">
         <span>座位总数: {{ seats.length }}</span>
         <span v-if="selectedSeat !== null">已选中: {{ seats[selectedSeat]?.seatNo }}</span>
+        <span v-if="duplicateSeatNos.length > 0" class="warning">
+          ⚠️ 座位编号重复: {{ duplicateSeatNos.join(', ') }}
+        </span>
       </div>
     </div>
     
@@ -299,6 +341,10 @@ onMounted(() => {
       <div class="legend-item">
         <div class="color-box" style="background: #10b981"></div>
         <span>选中座位</span>
+      </div>
+      <div class="legend-item">
+        <div class="color-box" style="background: #dc2626"></div>
+        <span>编号重复</span>
       </div>
       <div class="legend-item">
         <div class="color-circle" style="background: #fbbf24"></div>
@@ -391,12 +437,24 @@ onMounted(() => {
   color: #6b7280;
   padding-top: 12px;
   border-top: 1px solid #e5e7eb;
+  flex-wrap: wrap;
 }
 
 @media (prefers-color-scheme: dark) {
   .info {
     color: #9ca3af;
     border-top-color: #333;
+  }
+}
+
+.info .warning {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+@media (prefers-color-scheme: dark) {
+  .info .warning {
+    color: #f87171;
   }
 }
 

@@ -33,9 +33,28 @@ const handleSeatsChange = (newSeats) => {
   seats.value = newSeats
 }
 
+// 检测座位编号重名
+const checkDuplicateSeatNo = () => {
+  const seatNos = seats.value.map(s => s.seatNo)
+  const duplicates = seatNos.filter((no, index) => seatNos.indexOf(no) !== index)
+  
+  if (duplicates.length > 0) {
+    const uniqueDuplicates = [...new Set(duplicates)]
+    return uniqueDuplicates
+  }
+  return []
+}
+
 const saveSeatLayout = async () => {
   if (seats.value.length === 0) {
     error.value = '请先生成或添加座位'
+    return
+  }
+  
+  // 检测重名
+  const duplicates = checkDuplicateSeatNo()
+  if (duplicates.length > 0) {
+    error.value = `座位编号重复：${duplicates.join(', ')}，请修改后再保存`
     return
   }
   
@@ -44,13 +63,7 @@ const saveSeatLayout = async () => {
   message.value = ''
   
   try {
-    // 先删除所有旧座位
-    const existingSeats = await request(`/api/admin/study-rooms/${roomId.value}/seats`)
-    for (const seat of existingSeats) {
-      await request(`/api/admin/study-rooms/seats/${seat.id}`, { method: 'DELETE' })
-    }
-    
-    // 批量创建新座位
+    // 直接批量保存（后端会先删除旧座位）
     await request(`/api/admin/study-rooms/${roomId.value}/seats/batch`, {
       method: 'POST',
       body: JSON.stringify(seats.value)
@@ -72,6 +85,7 @@ const saveSeatLayout = async () => {
     }, 1500)
   } catch (e) {
     error.value = e.message || '保存失败'
+    console.error('保存座位布局失败:', e)
   } finally {
     saving.value = false
   }
@@ -116,6 +130,7 @@ onMounted(load)
         :mode="editMode"
         :canvas-width="900"
         :canvas-height="600"
+        :default-prefix="room?.name || 'A'"
         @change="handleSeatsChange"
       />
     </div>

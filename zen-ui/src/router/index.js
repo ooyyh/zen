@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { isAdmin, isLoggedIn } from '@/services/auth'
+import { isAdmin, isLoggedIn, isAdminOrTeacher } from '@/services/auth'
 import HomeView from '../views/HomeView.vue'
 
 const router = createRouter({
@@ -21,6 +21,12 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: () => import('../views/LoginView.vue'),
+      meta: { public: true }
+    },
+    {
+      path: '/register',
+      name: 'register',
+      component: () => import('../views/RegisterView.vue'),
       meta: { public: true }
     },
     {
@@ -135,7 +141,7 @@ const router = createRouter({
       path: '/admin/equipments/borrows',
       name: 'admin-equipments-borrows',
       component: () => import('../views/AdminEquipmentBorrowView.vue'),
-      meta: { title: '借用审批', parent: '后台管理', admin: true }
+      meta: { title: '借用审批', parent: '后台管理', adminOrTeacher: true }
     },
     {
       path: '/admin/bus/routes',
@@ -159,13 +165,13 @@ const router = createRouter({
       path: '/admin/lectures',
       name: 'admin-lectures',
       component: () => import('../views/AdminLectureView.vue'),
-      meta: { title: '讲座管理', parent: '后台管理', admin: true }
+      meta: { title: '讲座管理', parent: '后台管理', adminOrTeacher: true }
     },
     {
       path: '/admin/lectures/checkins',
       name: 'admin-lecture-checkins',
       component: () => import('../views/AdminLectureCheckinView.vue'),
-      meta: { title: '讲座签到', parent: '后台管理', admin: true }
+      meta: { title: '讲座签到', parent: '后台管理', adminOrTeacher: true }
     },
     {
       path: '/admin/users',
@@ -177,7 +183,7 @@ const router = createRouter({
       path: '/admin/broadcasts',
       name: 'admin-broadcasts',
       component: () => import('../views/AdminBroadcastView.vue'),
-      meta: { title: '通知发布', parent: '后台管理', admin: true }
+      meta: { title: '通知发布', parent: '后台管理', adminOrTeacher: true }
     },
     {
       path: '/admin/message-templates',
@@ -195,13 +201,13 @@ const router = createRouter({
       path: '/admin/study-rooms',
       name: 'admin-study-rooms',
       component: () => import('../views/AdminStudyRoomView.vue'),
-      meta: { title: '自习室管理', parent: '后台管理', admin: true }
+      meta: { title: '自习室管理', parent: '后台管理', adminOrTeacher: true }
     },
     {
       path: '/admin/study-rooms/:id/seats',
       name: 'admin-seat-management',
       component: () => import('../views/AdminSeatManagementView.vue'),
-      meta: { title: '座位管理', parent: '后台管理', admin: true }
+      meta: { title: '座位管理', parent: '后台管理', adminOrTeacher: true }
     },
     {
       path: '/admin/seat-reservations',
@@ -223,6 +229,9 @@ router.beforeEach((to) => {
     return '/login'
   }
   if (to.meta.admin && !isAdmin()) {
+    return '/dashboard'
+  }
+  if (to.meta.adminOrTeacher && !isAdminOrTeacher()) {
     return '/dashboard'
   }
   return true

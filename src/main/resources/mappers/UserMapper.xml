@@ -6,6 +6,7 @@
         <result column="username" property="username" />
         <result column="password_hash" property="passwordHash" />
         <result column="role" property="role" />
+        <result column="real_name" property="realName" />
         <result column="status" property="status" />
         <result column="created_at" property="createdAt" />
         <result column="updated_at" property="updatedAt" />
@@ -24,7 +25,7 @@
     </select>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
-        insert into `user` (username, password_hash, role, status)
-        values (#{username}, #{passwordHash}, #{role}, #{status})
+        insert into `user` (username, password_hash, role, real_name, status)
+        values (#{username}, #{passwordHash}, #{role}, #{realName}, #{status})
     </insert>
 </mapper>

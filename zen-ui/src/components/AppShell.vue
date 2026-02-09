@@ -1,7 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
-import { clearAuth, getUser, isAdmin } from '@/services/auth'
+import { clearAuth, getUser, isAdmin, isTeacher } from '@/services/auth'
 
 const props = defineProps({
   title: {
@@ -14,11 +14,13 @@ const route = useRoute()
 const router = useRouter()
 const user = getUser()
 const admin = computed(() => isAdmin())
+const teacher = computed(() => isTeacher())
 
 const text = {
   brandSub: '服务控制台',
   core: '核心功能',
   admin: '后台管理',
+  teacher: '教师专区',
   breadcrumb: '控制台',
   logout: '退出登录',
   unknownUser: '未知用户',
@@ -36,6 +38,14 @@ const text = {
     studyRooms: '自习室抢座',
     seatMy: '我的座位',
     messages: '通知中心'
+  },
+  teacherNav: {
+    lectures: '讲座管理',
+    lectureCheckin: '讲座签到',
+    equipmentBorrow: '设备借用审批',
+    studyRooms: '自习室管理',
+    seatManagement: '座位布局',
+    broadcasts: '通知发布'
   },
   adminNav: {
     approvals: '审批处理',
@@ -67,7 +77,8 @@ const storedSections = (() => {
 
 // 管理员默认收起核心功能，普通用户默认展开
 const sections = ref({
-  core: storedSections.core !== undefined ? storedSections.core : !admin.value,
+  core: storedSections.core !== undefined ? storedSections.core : !admin.value && !teacher.value,
+  teacher: storedSections.teacher !== false,
   admin: storedSections.admin !== false
 })
 
@@ -147,6 +158,47 @@ const adminItems = [
               <path :d="item.icon" fill="currentColor" />
             </svg>
             <span>{{ item.label }}</span>
+          </RouterLink>
+        </div>
+      </div>
+
+      <div v-if="teacher && !admin" class="nav-section">
+        <button class="nav-toggle" type="button" @click="toggleSection('teacher')" :aria-expanded="sections.teacher">
+          <span>{{ text.teacher }}</span>
+          <svg class="chevron" :class="{ rotated: !sections.teacher }" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 9l6 6 6-6" fill="currentColor" />
+          </svg>
+        </button>
+        <div class="nav-items" :class="{ collapsed: !sections.teacher }" :aria-hidden="!sections.teacher">
+          <RouterLink to="/admin/lectures" class="nav-item">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 6h12v4H6V6zm0 6h12v2H6v-2zm0 4h8v2H6v-2z" fill="currentColor" />
+            </svg>
+            <span>{{ text.teacherNav.lectures }}</span>
+          </RouterLink>
+          <RouterLink to="/admin/lectures/checkins" class="nav-item">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 4h12v2H6V4zm-1 4h14v2H5V8zm1 4h10v2H6v-2z" fill="currentColor" />
+            </svg>
+            <span>{{ text.teacherNav.lectureCheckin }}</span>
+          </RouterLink>
+          <RouterLink to="/admin/equipments/borrows" class="nav-item">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 4h12v2H6V4zm0 5h12v2H6V9zm0 5h12v2H6v-2z" fill="currentColor" />
+            </svg>
+            <span>{{ text.teacherNav.equipmentBorrow }}</span>
+          </RouterLink>
+          <RouterLink to="/admin/study-rooms" class="nav-item">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M3 3h18v2H3V3zm0 4h8v14H3V7zm10 0h8v14h-8V7z" fill="currentColor" />
+            </svg>
+            <span>{{ text.teacherNav.studyRooms }}</span>
+          </RouterLink>
+          <RouterLink to="/admin/broadcasts" class="nav-item">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 5h16v10H4V5zm3 2h10v2H7V7zm0 4h7v2H7v-2z" fill="currentColor" />
+            </svg>
+            <span>{{ text.teacherNav.broadcasts }}</span>
           </RouterLink>
         </div>
       </div>
@@ -258,17 +310,27 @@ const adminItems = [
   color: var(--text-muted);
   letter-spacing: 0.12em;
   cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.nav-toggle:hover {
+  color: var(--text);
 }
 
 .nav-toggle span {
   text-align: left;
+  transition: transform 0.2s ease;
+}
+
+.nav-toggle:hover span {
+  transform: translateX(2px);
 }
 
 .chevron {
   width: 14px;
   height: 14px;
   color: var(--text-light);
-  transition: transform 0.2s ease;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .chevron.rotated {
@@ -278,10 +340,17 @@ const adminItems = [
 .nav-items {
   display: grid;
   gap: 6px;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  max-height: 2000px;
+  opacity: 1;
 }
 
 .nav-items.collapsed {
-  display: none;
+  max-height: 0;
+  opacity: 0;
+  gap: 0;
+  pointer-events: none;
 }
 
 .nav-item {
@@ -292,17 +361,33 @@ const adminItems = [
   border-radius: 12px;
   color: var(--text-muted);
   transition: all 0.2s ease;
+  text-decoration: none;
+  transform: translateX(0);
+}
+
+.nav-item:hover {
+  transform: translateX(4px);
 }
 
 .nav-item svg {
   width: 18px;
   height: 18px;
+  transition: transform 0.2s ease;
+}
+
+.nav-item:hover svg {
+  transform: scale(1.1);
 }
 
 .nav-item.router-link-exact-active,
 .nav-item:hover {
   color: var(--primary);
   background: rgba(29, 78, 216, 0.12);
+}
+
+.nav-item.router-link-exact-active {
+  font-weight: 600;
+  box-shadow: 0 0 0 1px rgba(29, 78, 216, 0.2);
 }
 
 .content {

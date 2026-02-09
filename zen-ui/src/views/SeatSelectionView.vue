@@ -1,8 +1,10 @@
 <script setup>
-import { onMounted, ref, computed, nextTick } from 'vue'
+import { onMounted, onUnmounted, ref, computed, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import AppShell from '@/components/AppShell.vue'
+import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import { request } from '@/services/api'
+import websocket from '@/services/websocket'
 
 const route = useRoute()
 const router = useRouter()
@@ -20,16 +22,32 @@ const COLORS = {
   available: '#10b981',
   reserved: '#ef4444',
   selected: '#3b82f6',
+  pending: '#f59e0b',  // 预约中的颜色（橙色）
   power: '#fbbf24',
   text: '#ffffff'
 }
 
 const selectedSeatId = ref(null)
+const pendingSeats = ref(new Map())  // Map<seatId, {userId, username}>
+const currentUserId = ref(null)
+
+const dialog = ref({
+  show: false,
+  title: '',
+  message: '',
+  type: 'confirm',
+  seat: null
+})
 
 const load = async () => {
   error.value = ''
   try {
-    room.value = await request(`/api/study-rooms/${roomId.value}`)
+    const [roomData, userData] = await Promise.all([
+      request(`/api/study-rooms/${roomId.value}`),
+      request('/api/user/profile')
+    ])
+    room.value = roomData
+    currentUserId.value = userData.id
     
     // 默认时间：现在到4小时后
     const now = new Date()
@@ -38,8 +56,35 @@ const load = async () => {
     endTime.value = later.toISOString().slice(0, 16)
     
     await loadSeats()
+    
+    // 加载当前pending的座位状态
+    await loadPendingSeats()
+    
+    // 连接WebSocket并订阅座位状态
+    websocket.connect(() => {
+      websocket.subscribe('/topic/seat-status', handleSeatStatusUpdate)
+    })
   } catch (e) {
-    error.value = e.message || '加载失败'
+    error.value = e.message || 'Loading failed'
+  }
+}
+
+const loadPendingSeats = async () => {
+  try {
+    const data = await request(`/api/seat-status/pending/${roomId.value}`)
+    console.log('Loaded pending seats:', data)
+    // data 是 Map<seatId, {userId, username}>
+    pendingSeats.value.clear()
+    for (const [seatIdStr, info] of Object.entries(data)) {
+      const seatId = parseInt(seatIdStr)
+      pendingSeats.value.set(seatId, info)
+      console.log(`Set pending seat ${seatId}:`, info)
+    }
+    console.log('Final pendingSeats Map:', pendingSeats.value)
+    await nextTick()
+    drawSeats()
+  } catch (e) {
+    console.error('Failed to load pending seats:', e)
   }
 }
 
@@ -95,12 +140,26 @@ const drawSeats = () => {
   seats.value.forEach(seat => {
     const x = seat.positionX || 0
     const y = seat.positionY || 0
-    const isSelected = selectedSeatId.value === seat.id
-    const color = isSelected ? COLORS.selected : (seat.reserved ? COLORS.reserved : COLORS.available)
+    
+    let color = COLORS.available
+    const isPending = pendingSeats.value.has(seat.id)
+    
+    if (seat.reserved) {
+      color = COLORS.reserved
+    } else if (isPending) {
+      color = COLORS.pending
+    } else if (seat.id === selectedSeatId.value) {
+      color = COLORS.selected
+    }
     
     // 座位矩形
     ctx.value.fillStyle = color
     ctx.value.fillRect(x, y, SEAT_SIZE, SEAT_SIZE)
+    
+    // 座位边框
+    ctx.value.strokeStyle = '#333'
+    ctx.value.lineWidth = 1
+    ctx.value.strokeRect(x, y, SEAT_SIZE, SEAT_SIZE)
     
     // 座位编号
     ctx.value.fillStyle = COLORS.text
@@ -116,7 +175,47 @@ const drawSeats = () => {
       ctx.value.arc(x + SEAT_SIZE - 8, y + 8, 6, 0, Math.PI * 2)
       ctx.value.fill()
     }
+    
+    // 如果是预约中状态，显示用户名
+    if (isPending) {
+      const pendingInfo = pendingSeats.value.get(seat.id)
+      if (pendingInfo && pendingInfo.username) {
+        ctx.value.fillStyle = 'rgba(0, 0, 0, 0.7)'
+        ctx.value.fillRect(x, y + SEAT_SIZE - 15, SEAT_SIZE, 15)
+        ctx.value.fillStyle = '#fff'
+        ctx.value.font = '10px sans-serif'
+        ctx.value.fillText(pendingInfo.username, x + SEAT_SIZE / 2, y + SEAT_SIZE - 7)
+      }
+    }
   })
+}
+
+const handleSeatStatusUpdate = (data) => {
+  console.log('Seat status update:', data)
+  
+  if (data.status === 'PENDING') {
+    // 有人开始预约，保存用户信息
+    pendingSeats.value.set(data.seatId, {
+      userId: data.userId,
+      username: data.username || `User${data.userId}`
+    })
+    drawSeats()
+  } else if (data.status === 'AVAILABLE') {
+    // 有人取消预约
+    pendingSeats.value.delete(data.seatId)
+    drawSeats()
+  } else if (data.status === 'RESERVED') {
+    // 预约成功
+    pendingSeats.value.delete(data.seatId)
+    
+    const seat = seats.value.find(s => s.id === data.seatId)
+    if (seat) {
+      seat.reserved = true
+      drawSeats()
+    }
+    
+    setTimeout(() => loadSeats(), 500)
+  }
 }
 
 const handleCanvasClick = (e) => {
@@ -139,17 +238,58 @@ const handleCanvasClick = (e) => {
   }
 }
 
-const availableSeats = computed(() => seats.value.filter(s => !s.reserved))
+const availableSeats = computed(() => seats.value.filter(s => !s.reserved && !pendingSeats.value.has(s.id)))
 const reservedSeats = computed(() => seats.value.filter(s => s.reserved))
+const pendingCount = computed(() => pendingSeats.value.size)
 
-const reserve = async (seat) => {
-  if (seat.reserved) return
-  if (!confirm(`确认预约座位 ${seat.seatNo}？`)) {
+const showDialog = (title, message, type, seat = null) => {
+  dialog.value = { show: true, title, message, type, seat, confirmed: false }
+}
+
+const closeDialog = () => {
+  const oldSeat = dialog.value.seat
+  const wasConfirmed = dialog.value.confirmed
+  dialog.value.show = false
+  
+  // 如果取消预约，移除pending状态并通知后端
+  if (oldSeat && !wasConfirmed) {
+    request(`/api/seat-status/release/${oldSeat.id}`, { method: 'POST' }).catch(() => {})
+    pendingSeats.value.delete(oldSeat.id)
     selectedSeatId.value = null
     drawSeats()
-    return
   }
+}
+
+const handleDialogConfirm = async () => {
+  dialog.value.confirmed = true
+  if (dialog.value.seat) {
+    await doReserve(dialog.value.seat)
+  }
+}
+
+const reserve = async (seat) => {
+  if (seat.reserved || pendingSeats.value.has(seat.id)) return
   
+  // 立即标记为预约中并通知后端
+  try {
+    await request(`/api/seat-status/pending/${seat.id}`, { method: 'POST' })
+    
+    // 本地也立即显示（不等WebSocket）
+    const userData = await request('/api/user/profile').catch(() => ({ username: 'You' }))
+    pendingSeats.value.set(seat.id, {
+      userId: currentUserId.value,
+      username: userData.username || 'You'
+    })
+    drawSeats()
+    
+    const seatLabel = seat.seatNo || seat.id || 'this seat'
+    showDialog('Confirm Reservation', `Reserve seat ${seatLabel}?`, 'confirm', seat)
+  } catch (e) {
+    console.error('Failed to mark pending:', e)
+  }
+}
+
+const doReserve = async (seat) => {
   try {
     await request(`/api/study-rooms/seats/${seat.id}/reserve`, {
       method: 'POST',
@@ -158,20 +298,39 @@ const reserve = async (seat) => {
         endTime: new Date(endTime.value).toISOString()
       })
     })
-    alert('预约成功！')
-    router.push('/seat-reservations/my')
+    // 预约成功，pending状态会通过WebSocket广播移除
+    showDialog('Success', 'Reservation successful!', 'success', null)
+    setTimeout(() => {
+      router.push('/seat-reservations/my')
+    }, 1500)
   } catch (e) {
-    alert(e.message || '预约失败')
+    // 预约失败，释放pending状态
+    await request(`/api/seat-status/release/${seat.id}`, { method: 'POST' }).catch(() => {})
+    pendingSeats.value.delete(seat.id)
+    showDialog('Error', e.message || 'Reservation failed', 'error', null)
     selectedSeatId.value = null
     await loadSeats()
   }
 }
+
+onUnmounted(() => {
+  websocket.disconnect()
+})
 
 onMounted(load)
 </script>
 
 <template>
   <AppShell :title="room ? room.name : '选择座位'">
+    <ConfirmDialog
+      :show="dialog.show"
+      :title="dialog.title"
+      :message="dialog.message"
+      :type="dialog.type"
+      @confirm="handleDialogConfirm"
+      @close="closeDialog"
+    />
+    
     <div v-if="error" class="card error-card">{{ error }}</div>
     
     <div class="card filter-card">
@@ -194,8 +353,9 @@ onMounted(load)
       </div>
       
       <div class="stats">
-        <span class="stat available">可用: {{ availableSeats.length }}</span>
-        <span class="stat reserved">已占: {{ reservedSeats.length }}</span>
+        <span class="stat available">Available: {{ availableSeats.length }}</span>
+        <span class="stat reserved">Reserved: {{ reservedSeats.length }}</span>
+        <span v-if="pendingCount > 0" class="stat pending">Reserving: {{ pendingCount }}</span>
       </div>
     </div>
 
@@ -206,15 +366,23 @@ onMounted(load)
     <div class="legend-card card">
       <div class="legend-item">
         <div class="legend-box" style="background: #10b981"></div>
-        <span>可预约</span>
+        <span>Available</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-box" style="background: #f59e0b"></div>
+        <span>Reserving</span>
       </div>
       <div class="legend-item">
         <div class="legend-box" style="background: #ef4444"></div>
-        <span>已占用</span>
+        <span>Reserved</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-box" style="background: #3b82f6"></div>
+        <span>Selected</span>
       </div>
       <div class="legend-item">
         <div class="legend-circle" style="background: #fbbf24"></div>
-        <span>有电源</span>
+        <span>Has Power</span>
       </div>
     </div>
   </AppShell>
@@ -325,6 +493,12 @@ onMounted(load)
   color: #991b1b;
 }
 
+.stat.pending {
+  background: #fef3c7;
+  color: #92400e;
+  font-weight: 600;
+}
+
 @media (prefers-color-scheme: dark) {
   .stat.available {
     background: #064e3b;
@@ -333,6 +507,10 @@ onMounted(load)
   .stat.reserved {
     background: #7f1d1d;
     color: #fca5a5;
+  }
+  .stat.pending {
+    background: #78350f;
+    color: #fde68a;
   }
 }
 

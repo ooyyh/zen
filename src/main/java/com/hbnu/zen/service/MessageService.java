@@ -32,7 +32,8 @@ public class MessageService {
     public void sendTemplate(Long userId, String templateCode, Map<String, String> params) {
         MessageTemplate template = templateMapper.selectByCode(templateCode);
         if (template == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND, "???????");
+            System.out.println("Warning: Message template not found: " + templateCode);
+            return; // 模板不存在时不影响业务流程
         }
         String title = fillTemplate(template.getTitle(), params);
         String content = fillTemplate(template.getContent(), params);
@@ -52,10 +53,10 @@ public class MessageService {
     public void markRead(Long messageId, Long userId) {
         Message message = messageMapper.selectById(messageId);
         if (message == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND, "?????");
+            throw new BusinessException(ErrorCode.NOT_FOUND, "Message not found");
         }
         if (!message.getUserId().equals(userId)) {
-            throw new BusinessException(ErrorCode.FORBIDDEN, "????????");
+            throw new BusinessException(ErrorCode.FORBIDDEN, "No permission to read this message");
         }
         messageMapper.markRead(messageId, LocalDateTime.now());
     }
@@ -101,7 +102,7 @@ public class MessageService {
         }
         String normalized = role.trim().toUpperCase();
         if (!Role.ADMIN.equals(normalized) && !Role.TEACHER.equals(normalized) && !Role.STUDENT.equals(normalized)) {
-            throw new BusinessException(ErrorCode.BAD_REQUEST, "???????");
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "Invalid role");
         }
         return normalized;
     }

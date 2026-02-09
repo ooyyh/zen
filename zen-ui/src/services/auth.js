@@ -32,3 +32,13 @@ export const isAdmin = () => {
   const user = getUser()
   return user && user.role === 'ADMIN'
 }
+
+export const isTeacher = () => {
+  const user = getUser()
+  return user && user.role === 'TEACHER'
+}
+
+export const isAdminOrTeacher = () => {
+  const user = getUser()
+  return user && (user.role === 'ADMIN' || user.role === 'TEACHER')
+}

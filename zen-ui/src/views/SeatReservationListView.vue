@@ -1,10 +1,19 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import AppShell from '@/components/AppShell.vue'
+import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import { request } from '@/services/api'
 
 const list = ref([])
 const error = ref('')
+const dialog = ref({
+  show: false,
+  title: '',
+  message: '',
+  type: 'confirm',
+  action: null,
+  actionId: null
+})
 
 const load = async () => {
   error.value = ''
@@ -15,23 +24,47 @@ const load = async () => {
   }
 }
 
-const cancel = async (id) => {
-  if (!confirm('确认取消该座位预约？')) return
-  try {
-    await request(`/api/study-rooms/reservations/${id}/cancel`, { method: 'POST' })
-    await load()
-  } catch (e) {
-    alert(e.message || '取消失败')
+const showDialog = (title, message, type, action, id) => {
+  dialog.value = { show: true, title, message, type, action, actionId: id }
+}
+
+const closeDialog = () => {
+  dialog.value.show = false
+}
+
+const handleDialogConfirm = async () => {
+  if (dialog.value.action === 'cancel') {
+    await doCancel(dialog.value.actionId)
+  } else if (dialog.value.action === 'checkIn') {
+    await doCheckIn(dialog.value.actionId)
   }
 }
 
-const checkIn = async (id) => {
-  if (!confirm('确认签到？')) return
+const cancel = (id) => {
+  showDialog('取消预约', '确认取消该座位预约？', 'confirm', 'cancel', id)
+}
+
+const doCancel = async (id) => {
+  try {
+    await request(`/api/study-rooms/reservations/${id}/cancel`, { method: 'POST' })
+    await load()
+    showDialog('成功', '已取消预约', 'success', null, null)
+  } catch (e) {
+    showDialog('错误', e.message || '取消失败', 'error', null, null)
+  }
+}
+
+const checkIn = (id) => {
+  showDialog('签到确认', '确认签到？', 'confirm', 'checkIn', id)
+}
+
+const doCheckIn = async (id) => {
   try {
     await request(`/api/study-rooms/reservations/${id}/check-in`, { method: 'POST' })
     await load()
+    showDialog('成功', '签到成功！', 'success', null, null)
   } catch (e) {
-    alert(e.message || '签到失败')
+    showDialog('错误', e.message || '签到失败', 'error', null, null)
   }
 }
 
@@ -67,6 +100,15 @@ onMounted(load)
 
 <template>
   <AppShell title="我的座位">
+    <ConfirmDialog
+      :show="dialog.show"
+      :title="dialog.title"
+      :message="dialog.message"
+      :type="dialog.type"
+      @confirm="handleDialogConfirm"
+      @close="closeDialog"
+    />
+    
     <div v-if="error" class="card error-card">{{ error }}</div>
     <div class="card table-card">
       <table class="table">

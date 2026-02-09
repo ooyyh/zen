@@ -58,7 +58,11 @@ const submit = async () => {
           <button class="btn primary block" type="submit" :disabled="loading">
             {{ loading ? '登录中...' : '登录' }}
           </button>
-          <p class="helper">默认管理员：admin / admin123（首次启动自动创建）</p>
+          <p class="helper">
+            还没有账号？
+            <RouterLink to="/register" class="link">立即注册</RouterLink>
+          </p>
+          <p class="helper">默认管理员：admin / admin123</p>
         </form>
       </div>
       <div class="login-side card">
@@ -121,6 +125,15 @@ const submit = async () => {
   display: inline-block;
   margin-right: 10px;
   transform: translateY(-1px);
+}
+
+.link {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
 }
 
 @media (max-width: 960px) {

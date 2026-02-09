@@ -33,13 +33,30 @@ public class UserService {
     public User createUser(String username, String password, String role) {
         User existing = userMapper.selectByUsername(username);
         if (existing != null) {
-            throw new BusinessException(ErrorCode.BAD_REQUEST, "用户名已存在");
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "Username already exists");
         }
         User user = new User();
         user.setUsername(username);
         user.setPasswordHash(passwordEncoder.encode(password));
         user.setRole(role);
         user.setStatus(1);
+        userMapper.insert(user);
+        return user;
+    }
+
+    public User register(String username, String password, String role, String realName) {
+        User existing = userMapper.selectByUsername(username);
+        if (existing != null) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "Username already exists");
+        }
+        User user = new User();
+        user.setUsername(username);
+        user.setPasswordHash(passwordEncoder.encode(password));
+        user.setRole(role != null ? role : "STUDENT");
+        user.setStatus(1);
+        if (realName != null && !realName.trim().isEmpty()) {
+            user.setRealName(realName);
+        }
         userMapper.insert(user);
         return user;
     }

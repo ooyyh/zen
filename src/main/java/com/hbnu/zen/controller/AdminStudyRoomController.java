@@ -76,6 +76,13 @@ public class AdminStudyRoomController {
 
     @PostMapping("/{roomId}/seats/batch")
     public ApiResponse<Void> batchCreateSeats(@PathVariable Long roomId, @RequestBody List<Seat> seats) {
+        // 先删除该自习室的所有旧座位
+        List<Seat> existingSeats = seatMapper.selectByRoomId(roomId);
+        for (Seat seat : existingSeats) {
+            seatMapper.updateStatus(seat.getId(), 0);
+        }
+        
+        // 批量插入新座位
         for (Seat seat : seats) {
             seat.setStudyRoomId(roomId);
             seatMapper.insert(seat);
