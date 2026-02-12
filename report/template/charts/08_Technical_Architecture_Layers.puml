@@ -1,0 +1,156 @@
+@startuml 技术架构分层图
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam package {
+  BackgroundColor #E8F5E8
+  BorderColor #4CAF50
+}
+
+title EduSphere 在线教育平台 - 技术架构分层图
+
+package "表现层 (Presentation Layer)" as PresentationLayer {
+  [Vue 3 框架] as Vue3
+  [Element Plus UI] as ElementPlus
+  [Vue Router 4] as VueRouter
+  [Pinia 状态管理] as Pinia
+  [Axios HTTP客户端] as Axios
+  [Vite 构建工具] as Vite
+}
+
+package "控制层 (Controller Layer)" as ControllerLayer {
+  [UserController] as UserController
+  [CourseController] as CourseController
+  [TeacherController] as TeacherController
+  [AdminController] as AdminController
+  [LearningController] as LearningController
+  [PurchaseController] as PurchaseController
+  [RechargeController] as RechargeController
+}
+
+package "服务层 (Service Layer)" as ServiceLayer {
+  [UserService] as UserService
+  [CourseService] as CourseService
+  [TeacherService] as TeacherService
+  [AdminService] as AdminService
+  [LearningService] as LearningService
+  [PurchaseService] as PurchaseService
+  [RechargeService] as RechargeService
+}
+
+package "数据访问层 (Data Access Layer)" as DataAccessLayer {
+  [MyBatis-Plus] as MyBatisPlus
+  [Mapper 接口] as MapperInterface
+  [XML 映射文件] as XMLMapping
+  [数据库连接池] as ConnectionPool
+}
+
+package "数据层 (Data Layer)" as DataLayer {
+  [MySQL 8.0] as MySQL
+  [数据库表] as DatabaseTables
+  [索引优化] as IndexOptimization
+  [事务管理] as TransactionManagement
+}
+
+package "中间件层 (Middleware Layer)" as MiddlewareLayer {
+  [JWT 认证中间件] as JWT
+  [CORS 跨域中间件] as CORS
+  [全局异常处理] as ExceptionHandler
+  [请求日志] as RequestLogging
+  [权限验证] as PermissionCheck
+}
+
+package "工具层 (Utility Layer)" as UtilityLayer {
+  [Result 响应工具] as ResultUtil
+  [JWT 工具类] as JWTUtil
+  [密码加密] as PasswordUtil
+  [文件上传] as FileUpload
+  [日期时间处理] as DateTimeUtil
+}
+
+' 分层依赖关系
+PresentationLayer --> ControllerLayer : HTTP请求
+ControllerLayer --> ServiceLayer : 业务调用
+ServiceLayer --> DataAccessLayer : 数据操作
+DataAccessLayer --> DataLayer : 数据库操作
+
+ControllerLayer --> MiddlewareLayer : 中间件处理
+ServiceLayer --> UtilityLayer : 工具类调用
+
+' 技术栈说明
+note right of PresentationLayer
+  **前端技术栈**
+  - Vue 3 + Composition API
+  - Element Plus UI组件库
+  - Vue Router 4 路由管理
+  - Pinia 状态管理
+  - Axios HTTP请求库
+  - Vite 现代化构建工具
+end note
+
+note right of ControllerLayer
+  **控制器层**
+  - RESTful API设计
+  - 请求参数验证
+  - 响应数据封装
+  - 异常处理
+  - 权限控制
+end note
+
+note right of ServiceLayer
+  **服务层**
+  - 业务逻辑处理
+  - 事务管理
+  - 数据转换
+  - 业务规则验证
+  - 服务间调用
+end note
+
+note right of DataAccessLayer
+  **数据访问层**
+  - MyBatis-Plus ORM
+  - SQL映射管理
+  - 数据库连接管理
+  - 查询优化
+  - 缓存策略
+end note
+
+note right of DataLayer
+  **数据层**
+  - MySQL 8.0 数据库
+  - 11个核心业务表
+  - 索引优化设计
+  - 事务ACID特性
+  - 数据备份策略
+end note
+
+note right of MiddlewareLayer
+  **中间件层**
+  - JWT身份认证
+  - CORS跨域处理
+  - 全局异常捕获
+  - 请求日志记录
+  - 权限验证拦截
+end note
+
+note right of UtilityLayer
+  **工具层**
+  - 统一响应格式
+  - JWT Token处理
+  - 密码加密解密
+  - 文件上传处理
+  - 日期时间工具
+end note
+
+' 架构特点
+note bottom
+  **架构特点**
+  - 分层架构设计
+  - 职责分离明确
+  - 高内聚低耦合
+  - 易于维护扩展
+  - 支持水平扩展
+  - 安全性保障
+end note
+
+@enduml
+

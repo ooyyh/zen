@@ -1,0 +1,113 @@
+@startuml 业务流程时序图
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam sequence {
+  ArrowColor #1976D2
+  LifeLineBackgroundColor #E3F2FD
+  LifeLineBorderColor #1976D2
+}
+
+title EduSphere 在线教育平台 - 业务流程时序图
+
+actor "学生" as Student
+participant "前端Vue应用" as Frontend
+participant "后端Spring Boot" as Backend
+participant "数据库MySQL" as Database
+actor "教师" as Teacher
+actor "管理员" as Admin
+
+== 用户注册登录流程 ==
+Student -> Frontend: 访问注册页面
+Frontend -> Backend: POST /user/register
+Backend -> Database: 检查用户名是否存在
+Database --> Backend: 返回检查结果
+Backend -> Database: 插入新用户记录
+Database --> Backend: 返回插入结果
+Backend --> Frontend: 返回注册结果
+Frontend --> Student: 显示注册成功
+
+Student -> Frontend: 输入登录信息
+Frontend -> Backend: POST /user/login
+Backend -> Database: 验证用户凭据
+Database --> Backend: 返回用户信息
+Backend -> Backend: 生成JWT Token
+Backend --> Frontend: 返回Token和用户信息
+Frontend -> Frontend: 存储Token到本地
+Frontend --> Student: 跳转到对应页面
+
+== 教师创建课程流程 ==
+Teacher -> Frontend: 访问教师工作台
+Frontend -> Backend: GET /teacher/courses
+Backend -> Database: 查询教师课程
+Database --> Backend: 返回课程列表
+Backend --> Frontend: 返回课程数据
+Frontend --> Teacher: 显示课程列表
+
+Teacher -> Frontend: 点击创建课程
+Frontend -> Frontend: 跳转到课程创建页面
+Teacher -> Frontend: 填写课程信息
+Frontend -> Backend: POST /teacher/courses
+Backend -> Database: 插入课程记录
+Database --> Backend: 返回插入结果
+Backend --> Frontend: 返回创建结果
+Frontend --> Teacher: 显示创建成功
+
+== 学生购买课程流程 ==
+Student -> Frontend: 浏览课程详情
+Frontend -> Backend: GET /course/{id}
+Backend -> Database: 查询课程信息
+Database --> Backend: 返回课程数据
+Backend --> Frontend: 返回课程详情
+Frontend --> Student: 显示课程信息
+
+Student -> Frontend: 点击购买课程
+Frontend -> Backend: POST /purchase/course
+Backend -> Database: 检查用户余额
+Database --> Backend: 返回余额信息
+Backend -> Database: 扣除用户余额
+Backend -> Database: 增加讲师收入
+Backend -> Database: 记录购买信息
+Database --> Backend: 返回操作结果
+Backend --> Frontend: 返回购买结果
+Frontend --> Student: 显示购买成功
+
+== 学生学习课程流程 ==
+Student -> Frontend: 进入学习页面
+Frontend -> Backend: GET /learning/progress/{courseId}
+Backend -> Database: 查询学习进度
+Database --> Backend: 返回进度数据
+Backend --> Frontend: 返回学习进度
+Frontend --> Student: 显示学习内容
+
+Student -> Frontend: 完成课时学习
+Frontend -> Backend: POST /learning/complete/{lessonId}
+Backend -> Database: 更新学习进度
+Database --> Backend: 返回更新结果
+Backend --> Frontend: 返回完成结果
+Frontend --> Student: 更新进度显示
+
+== 管理员审核课程流程 ==
+Admin -> Frontend: 访问管理后台
+Frontend -> Backend: GET /admin/courses/pending
+Backend -> Database: 查询待审核课程
+Database --> Backend: 返回课程列表
+Backend --> Frontend: 返回待审核课程
+Frontend --> Admin: 显示待审核列表
+
+Admin -> Frontend: 审核通过课程
+Frontend -> Backend: POST /admin/courses/{id}/approve
+Backend -> Database: 更新课程状态为published
+Database --> Backend: 返回更新结果
+Backend --> Frontend: 返回审核结果
+Frontend --> Admin: 显示审核成功
+
+note over Student, Database
+  **关键业务流程**
+  1. 用户注册登录 - JWT认证
+  2. 教师创作课程 - 完整CRUD
+  3. 学生购买学习 - 支付流程
+  4. 管理员审核管理 - 权限控制
+end note
+
+@enduml
+

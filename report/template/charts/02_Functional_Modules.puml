@@ -1,0 +1,127 @@
+@startuml 功能模块图
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam packageStyle rectangle
+
+title EduSphere 在线教育平台 - 功能模块图
+
+package "用户管理模块" as UserModule {
+  [用户注册] as Register
+  [用户登录] as Login
+  [个人信息管理] as Profile
+  [密码修改] as PasswordChange
+  [头像上传] as AvatarUpload
+  [角色权限控制] as RoleControl
+}
+
+package "课程管理模块" as CourseModule {
+  [课程浏览] as CourseBrowse
+  [课程搜索] as CourseSearch
+  [课程详情] as CourseDetail
+  [课程分类] as CourseCategory
+  [课程评价] as CourseReview
+  [课程大纲] as CourseOutline
+  [课程状态管理] as CourseStatus
+}
+
+package "教师创作模块" as TeacherModule {
+  [教师工作台] as TeacherDashboard
+  [课程创建] as CourseCreate
+  [课程编辑] as CourseEdit
+  [章节管理] as SectionManage
+  [课时管理] as LessonManage
+  [课程发布] as CoursePublish
+  [课程统计] as CourseStats
+}
+
+package "学习模块" as LearningModule {
+  [学习页面] as LearningPage
+  [视频播放] as VideoPlayer
+  [文档查看] as DocumentView
+  [测验功能] as QuizSystem
+  [学习进度] as LearningProgress
+  [学习记录] as LearningRecord
+}
+
+package "购买模块" as PurchaseModule {
+  [课程购买] as CoursePurchase
+  [余额充值] as BalanceRecharge
+  [购买记录] as PurchaseRecord
+  [我的课程] as MyCourses
+  [支付处理] as PaymentProcess
+}
+
+package "管理模块" as AdminModule {
+  [管理员后台] as AdminDashboard
+  [课程审核] as CourseReview
+  [用户管理] as UserManage
+  [数据统计] as DataStatistics
+  [系统概览] as SystemOverview
+  [收入统计] as IncomeStats
+}
+
+package "首页模块" as HomeModule {
+  [首页展示] as HomePage
+  [热门课程] as HotCourses
+  [最新课程] as NewCourses
+  [分类导航] as CategoryNav
+  [搜索功能] as SearchFunction
+}
+
+' 模块间关系
+UserModule --> CourseModule : 用户浏览课程
+UserModule --> LearningModule : 用户学习课程
+UserModule --> PurchaseModule : 用户购买课程
+UserModule --> AdminModule : 管理员管理
+
+TeacherModule --> CourseModule : 教师创建课程
+TeacherModule --> AdminModule : 课程审核
+
+CourseModule --> LearningModule : 课程学习
+CourseModule --> PurchaseModule : 课程购买
+
+LearningModule --> PurchaseModule : 学习权限验证
+
+AdminModule --> UserModule : 用户管理
+AdminModule --> CourseModule : 课程管理
+AdminModule --> TeacherModule : 教师管理
+
+HomeModule --> CourseModule : 课程展示
+HomeModule --> UserModule : 用户入口
+
+note right of UserModule
+  **用户管理**
+  - 支持三种角色：管理员、教师、学生
+  - JWT身份认证
+  - 个人信息管理
+end note
+
+note right of TeacherModule
+  **教师创作**
+  - 课程全生命周期管理
+  - 章节课时管理
+  - 课程发布审核
+end note
+
+note right of LearningModule
+  **学习功能**
+  - 多媒体内容支持
+  - 学习进度跟踪
+  - 测验系统
+end note
+
+note right of PurchaseModule
+  **购买系统**
+  - 模拟充值功能
+  - 课程购买流程
+  - 余额管理
+end note
+
+note right of AdminModule
+  **管理后台**
+  - 课程审核管理
+  - 用户权限管理
+  - 数据统计分析
+end note
+
+@enduml

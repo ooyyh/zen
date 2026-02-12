@@ -1,0 +1,170 @@
+@startuml 部署架构图
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam component {
+  BackgroundColor #E3F2FD
+  BorderColor #1976D2
+}
+skinparam database {
+  BackgroundColor #FFF3E0
+  BorderColor #FF9800
+}
+skinparam cloud {
+  BackgroundColor #E8F5E8
+  BorderColor #4CAF50
+}
+
+title EduSphere 在线教育平台 - 部署架构图
+
+cloud "用户端" as UserEnd {
+  [Web浏览器] as WebBrowser
+  [移动端浏览器] as MobileBrowser
+}
+
+cloud "CDN/静态资源" as CDN {
+  [静态文件] as StaticFiles
+  [图片资源] as Images
+  [视频资源] as Videos
+}
+
+node "负载均衡器" as LoadBalancer {
+  [Nginx] as Nginx
+}
+
+node "应用服务器集群" as AppServers {
+  node "应用服务器1" as AppServer1 {
+    [Spring Boot应用] as SpringBoot1
+    [JVM] as JVM1
+  }
+  node "应用服务器2" as AppServer2 {
+    [Spring Boot应用] as SpringBoot2
+    [JVM] as JVM2
+  }
+  node "应用服务器N" as AppServerN {
+    [Spring Boot应用] as SpringBootN
+    [JVM] as JVMN
+  }
+}
+
+node "前端服务器" as FrontendServer {
+  [Vue 3 应用] as VueApp
+  [Nginx静态服务] as NginxStatic
+}
+
+node "数据库服务器" as DatabaseServer {
+  database "MySQL 8.0" as MySQL {
+    [主库] as MasterDB
+    [从库1] as SlaveDB1
+    [从库2] as SlaveDB2
+  }
+}
+
+node "缓存服务器" as CacheServer {
+  [Redis] as Redis
+  [会话存储] as SessionStore
+  [缓存数据] as CacheData
+}
+
+node "文件存储服务器" as FileServer {
+  [文件系统] as FileSystem
+  [课程封面] as CourseCovers
+  [用户头像] as UserAvatars
+  [课程视频] as CourseVideos
+  [课程文档] as CourseDocuments
+}
+
+node "监控服务器" as MonitorServer {
+  [应用监控] as AppMonitor
+  [性能监控] as PerfMonitor
+  [日志收集] as LogCollector
+  [告警系统] as AlertSystem
+}
+
+' 连接关系
+UserEnd --> LoadBalancer : HTTP/HTTPS请求
+WebBrowser --> LoadBalancer
+MobileBrowser --> LoadBalancer
+
+LoadBalancer --> FrontendServer : 静态资源请求
+LoadBalancer --> AppServers : API请求
+
+FrontendServer --> CDN : 静态资源
+CDN --> UserEnd : 静态文件
+
+AppServer1 --> DatabaseServer : 数据库操作
+AppServer2 --> DatabaseServer
+AppServerN --> DatabaseServer
+
+AppServer1 --> CacheServer : 缓存操作
+AppServer2 --> CacheServer
+AppServerN --> CacheServer
+
+AppServer1 --> FileServer : 文件操作
+AppServer2 --> FileServer
+AppServerN --> FileServer
+
+AppServers --> MonitorServer : 监控数据
+DatabaseServer --> MonitorServer
+CacheServer --> MonitorServer
+
+' 部署说明
+note right of UserEnd
+  **用户端**
+  - 支持PC和移动端
+  - 现代浏览器兼容
+  - 响应式设计
+end note
+
+note right of AppServers
+  **应用服务器**
+  - Spring Boot应用
+  - JVM调优配置
+  - 集群部署
+  - 负载均衡
+end note
+
+note right of DatabaseServer
+  **数据库服务器**
+  - MySQL主从复制
+  - 读写分离
+  - 数据备份
+  - 性能优化
+end note
+
+note right of CacheServer
+  **缓存服务器**
+  - Redis集群
+  - 会话存储
+  - 数据缓存
+  - 高可用
+end note
+
+note right of FileServer
+  **文件存储**
+  - 分布式文件系统
+  - 多媒体文件存储
+  - 备份策略
+  - 访问控制
+end note
+
+note right of MonitorServer
+  **监控系统**
+  - 应用性能监控
+  - 系统资源监控
+  - 日志分析
+  - 告警通知
+end note
+
+' 部署环境
+note bottom
+  **部署环境配置**
+  - 操作系统: Linux CentOS 7+
+  - 应用服务器: Tomcat 9.0+
+  - 数据库: MySQL 8.0+
+  - 缓存: Redis 6.0+
+  - 负载均衡: Nginx 1.18+
+  - 监控: Prometheus + Grafana
+end note
+
+@enduml
+

@@ -1,34 +1,66 @@
-@startuml Deployment Architecture
+@startuml Deployment_Architecture
 !theme plain
-skinparam backgroundColor #FFFFFF
+skinparam backgroundColor #FEFEFE
+skinparam classBackgroundColor #F0F0F0
 
-title Zen Campus - Deployment Architecture
+package "生产环境部署架构" {
+    package "客户端层" {
+        actor [浏览器客户端] as Browser
+        actor [移动设备] as Mobile
+    }
 
-cloud "Clients" {
-  [PC Browser]
-  [Mobile Browser]
-}
+    package "Web服务层" {
+        component [Nginx 负载均衡] as LB
+        component [Nginx 反向代理] as Proxy
+    }
 
-node "Access Layer" {
-  [Nginx Reverse Proxy]
-}
+    package "应用服务层" {
+        component [Spring Boot 实例1] as App1
+        component [Spring Boot 实例2] as App2
+        component [Spring Boot 实例N] as AppN
+    }
 
-node "Frontend" {
-  [Vue Dist Static Assets]
-}
+    package "数据存储层" {
+        database [MySQL 主库] as MySQLMaster
+        database [MySQL 从库] as MySQLSlave
+        database [Redis 主节点] as RedisMaster
+        database [Redis 从节点] as RedisSlave
+    }
 
-node "Application" {
-  [Spring Boot Instance A]
-  [Spring Boot Instance B]
-}
+    package "监控与日志" {
+        component [日志收集] as Logging
+        component [性能监控] as Monitor
+        component [告警系统] as Alert
+    }
 
-node "Data" {
-  database "MySQL (zen)"
-  [Redis]
-}
+    Browser --> LB : HTTP/HTTPS
+    Mobile --> LB : HTTP/HTTPS
+    LB --> Proxy : 转发
+    Proxy --> App1 : 反向代理
+    Proxy --> App2 : 反向代理
+    Proxy --> AppN : 反向代理
 
-node "Realtime" {
-  [WebSocket STOMP Broker]
+    App1 --> MySQLMaster : 写操作
+    App1 --> MySQLSlave : 读操作
+    App2 --> MySQLMaster : 写操作
+    App2 --> MySQLSlave : 读操作
+    AppN --> MySQLMaster : 写操作
+    AppN --> MySQLSlave : 读操作
+
+    App1 --> RedisMaster : 缓存/锁
+    App2 --> RedisMaster : 缓存/锁
+    AppN --> RedisMaster : 缓存/锁
+
+    MySQLMaster -.-> MySQLSlave : 主从复制
+    RedisMaster -.-> RedisSlave : 数据同步
+
+    App1 --> Logging : 日志
+    App2 --> Logging : 日志
+    AppN --> Logging : 日志
+    App1 --> Monitor : 指标
+    App2 --> Monitor : 指标
+    AppN --> Monitor : 指标
+    Monitor --> Alert : 告警
 }
 
 @enduml

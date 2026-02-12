@@ -1,47 +1,51 @@
-@startuml Technical Layers
+@startuml Technical_Architecture_Layers
 !theme plain
-skinparam backgroundColor #FFFFFF
+skinparam backgroundColor #FEFEFE
+skinparam classBackgroundColor #F0F0F0
 
-title Zen Campus - Technical Architecture Layers
+package "技术架构分层" {
+    package "表现层" {
+        component [Vue 3 组件] as Vue
+        component [Canvas 编辑器] as Canvas
+        component [WebSocket 客户端] as WSClient
+    }
 
-package "Presentation" {
-  [Vue 3 + Vite]
-  [Router + AppShell]
-  [ECharts]
-  [STOMP Client]
-}
+    package "业务逻辑层" {
+        component [Service 服务类] as Service
+        component [业务规则引擎] as Rules
+        component [审批流程] as Workflow
+    }
 
-package "Controller" {
-  [AuthController]
-  [ReservationController]
-  [LectureController]
-  [EquipmentController]
-  [BusController]
-  [StudyRoomController]
-  [Admin Controllers]
-}
+    package "数据访问层" {
+        component [MyBatis Mapper] as Mapper
+        component [SQL 查询] as SQL
+        component [ORM 映射] as ORM
+    }
 
-package "Service" {
-  [UserService]
-  [ReservationService]
-  [LectureService]
-  [EquipmentBorrowService]
-  [BusBookingService]
-  [SeatReservationService]
-  [MessageService]
-  [ReportService]
-}
+    package "基础设施层" {
+        component [Spring Boot 框架] as Spring
+        component [Redis 缓存] as Cache
+        component [分布式锁] as Lock
+    }
 
-package "Data Access" {
-  [MyBatis Mapper]
-  [Mapper XML]
-}
+    package "数据存储层" {
+        database [MySQL 数据库] as DB
+        database [Redis 缓存库] as Redis
+    }
 
-package "Infrastructure" {
-  [MySQL]
-  [Redis + Redisson]
-  [WebSocket Broker]
-  [JWT + Interceptor]
+    Vue --> Service : 调用
+    Canvas --> Service : 调用
+    WSClient --> Service : 调用
+    Service --> Rules : 使用
+    Service --> Workflow : 使用
+    Service --> Mapper : 调用
+    Mapper --> SQL : 执行
+    SQL --> ORM : 映射
+    ORM --> DB : 操作
+    Service --> Cache : 使用
+    Service --> Lock : 使用
+    Cache --> Redis : 存储
+    Lock --> Redis : 实现
 }
 
 @enduml

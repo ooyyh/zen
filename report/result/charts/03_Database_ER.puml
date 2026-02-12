@@ -1,123 +1,104 @@
-@startuml Database ER
+@startuml Database_ER
 !theme plain
-skinparam backgroundColor #FFFFFF
+skinparam backgroundColor #FEFEFE
+skinparam classBackgroundColor #F0F0F0
 
-title Zen Campus - Core ER
-
-entity user {
-  * id : BIGINT <<PK>>
+entity "users" {
+  * id : INT
   --
   username : VARCHAR
+  password : VARCHAR
+  email : VARCHAR
+  real_name : VARCHAR
+  created_at : DATETIME
+}
+
+entity "user_roles" {
+  * id : INT
+  --
+  user_id : INT
   role : VARCHAR
 }
 
-entity classroom {
-  * id : BIGINT <<PK>>
+entity "classroom" {
+  * id : INT
+  --
+  name : VARCHAR
+  capacity : INT
+  location : VARCHAR
 }
 
-entity reservation {
-  * id : BIGINT <<PK>>
+entity "reservation" {
+  * id : INT
   --
-  user_id : BIGINT <<FK>>
-  classroom_id : BIGINT <<FK>>
+  user_id : INT
+  classroom_id : INT
+  start_time : DATETIME
+  end_time : DATETIME
   status : VARCHAR
 }
 
-entity approval_task {
-  * id : BIGINT <<PK>>
+entity "equipment" {
+  * id : INT
   --
-  reservation_id : BIGINT <<FK>>
+  name : VARCHAR
+  quantity : INT
+  description : VARCHAR
 }
 
-entity lecture {
-  * id : BIGINT <<PK>>
-}
-
-entity lecture_signup {
-  * id : BIGINT <<PK>>
+entity "equipment_borrow" {
+  * id : INT
   --
-  lecture_id : BIGINT <<FK>>
-  user_id : BIGINT <<FK>>
+  user_id : INT
+  equipment_id : INT
+  borrow_date : DATETIME
+  return_date : DATETIME
+  status : VARCHAR
 }
 
-entity equipment {
-  * id : BIGINT <<PK>>
-}
-
-entity equipment_borrow {
-  * id : BIGINT <<PK>>
+entity "lecture" {
+  * id : INT
   --
-  equipment_id : BIGINT <<FK>>
-  user_id : BIGINT <<FK>>
+  title : VARCHAR
+  teacher_id : INT
+  capacity : INT
+  time : DATETIME
+  location : VARCHAR
 }
 
-entity bus_route {
-  * id : BIGINT <<PK>>
-}
-
-entity bus_trip {
-  * id : BIGINT <<PK>>
+entity "lecture_signup" {
+  * id : INT
   --
-  route_id : BIGINT <<FK>>
+  user_id : INT
+  lecture_id : INT
+  status : VARCHAR
 }
 
-entity bus_booking {
-  * id : BIGINT <<PK>>
+entity "study_room" {
+  * id : INT
   --
-  trip_id : BIGINT <<FK>>
-  user_id : BIGINT <<FK>>
+  name : VARCHAR
+  total_seats : INT
 }
 
-entity study_room {
-  * id : BIGINT <<PK>>
-}
-
-entity seat {
-  * id : BIGINT <<PK>>
+entity "seat_reservation" {
+  * id : INT
   --
-  study_room_id : BIGINT <<FK>>
+  user_id : INT
+  seat_id : INT
+  room_id : INT
+  status : VARCHAR
+  created_at : DATETIME
 }
 
-entity seat_reservation {
-  * id : BIGINT <<PK>>
-  --
-  seat_id : BIGINT <<FK>>
-  user_id : BIGINT <<FK>>
-}
-
-entity message_template {
-  * id : BIGINT <<PK>>
-}
-
-entity message {
-  * id : BIGINT <<PK>>
-  --
-  user_id : BIGINT <<FK>>
-}
-
-entity sys_config {
-  * config_key : VARCHAR <<PK>>
-}
-
-user ||--o{ reservation
-classroom ||--o{ reservation
-reservation ||--o| approval_task
-
-lecture ||--o{ lecture_signup
-user ||--o{ lecture_signup
-
-equipment ||--o{ equipment_borrow
-user ||--o{ equipment_borrow
-
-bus_route ||--o{ bus_trip
-bus_trip ||--o{ bus_booking
-user ||--o{ bus_booking
-
-study_room ||--o{ seat
-seat ||--o{ seat_reservation
-user ||--o{ seat_reservation
-
-message_template ||--o{ message
-user ||--o{ message
+users ||--o{ user_roles : has
+users ||--o{ reservation : makes
+users ||--o{ equipment_borrow : borrows
+users ||--o{ lecture_signup : signs_up
+users ||--o{ seat_reservation : reserves
+classroom ||--o{ reservation : has
+equipment ||--o{ equipment_borrow : has
+lecture ||--o{ lecture_signup : has
+study_room ||--o{ seat_reservation : has
 
 @enduml

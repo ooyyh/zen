@@ -1,63 +1,48 @@
-@startuml API Design
+@startuml API_Interface_Design
 !theme plain
-skinparam backgroundColor #FFFFFF
+skinparam backgroundColor #FEFEFE
+skinparam classBackgroundColor #F0F0F0
 
-title Zen Campus - API Interface Design
+package "REST API 接口设计" {
+    rectangle "认证接口" {
+        usecase "POST /api/auth/login" as API1
+        usecase "POST /api/auth/register" as API2
+        usecase "GET /api/auth/current" as API3
+    }
 
-package "Auth" {
-  [POST /api/auth/login]
-  [POST /api/auth/register]
-  [POST /api/auth/me]
-}
+    rectangle "教室预约接口" {
+        usecase "GET /api/classroom" as API4
+        usecase "POST /api/reservation" as API5
+        usecase "GET /api/reservation/my" as API6
+        usecase "DELETE /api/reservation/{id}" as API7
+    }
 
-package "Classroom and Reservation" {
-  [GET /api/classrooms]
-  [POST /api/reservations]
-  [GET /api/reservations/my]
-  [GET /api/reservations/{id}/timeline]
-  [POST /api/admin/approvals/{id}/approve]
-  [POST /api/admin/approvals/{id}/reject]
-}
+    rectangle "设备借用接口" {
+        usecase "GET /api/equipment" as API8
+        usecase "POST /api/equipment/borrow" as API9
+        usecase "GET /api/equipment/borrow/my" as API10
+        usecase "PUT /api/equipment/borrow/{id}/return" as API11
+    }
 
-package "Lecture" {
-  [GET /api/lectures]
-  [POST /api/lectures/{id}/signup]
-  [POST /api/lectures/{id}/cancel]
-  [POST /api/lectures/{id}/checkin]
-  [GET /api/admin/lectures]
-}
+    rectangle "座位预约接口" {
+        usecase "GET /api/study-room" as API12
+        usecase "GET /api/seat/layout/{roomId}" as API13
+        usecase "POST /api/seat/reserve" as API14
+        usecase "DELETE /api/seat/reservation/{id}" as API15
+        usecase "GET /api/seat/reservation/my" as API16
+    }
 
-package "Equipment" {
-  [GET /api/equipments]
-  [POST /api/equipments/{id}/borrow]
-  [POST /api/equipments/borrows/{id}/return]
-  [GET /api/admin/equipments]
-}
+    rectangle "讲座接口" {
+        usecase "GET /api/lecture" as API17
+        usecase "POST /api/lecture/signup" as API18
+        usecase "GET /api/lecture/signup/my" as API19
+    }
 
-package "Bus" {
-  [GET /api/bus/trips]
-  [POST /api/bus/trips/{id}/book]
-  [POST /api/bus/bookings/{id}/cancel]
-  [GET /api/admin/bus/routes]
-  [POST /api/admin/bus/trips]
-}
-
-package "Study Room" {
-  [GET /api/study-rooms]
-  [GET /api/study-rooms/{id}/seats]
-  [POST /api/study-rooms/seats/{id}/reserve]
-  [POST /api/seat-status/pending/{seatId}]
-  [POST /api/seat-status/release/{seatId}]
-}
-
-package "Messaging and Ops" {
-  [GET /api/messages]
-  [POST /api/messages/{id}/read]
-  [POST /api/admin/messages/broadcast]
-  [GET /api/admin/reports/overview]
-  [GET /api/dashboard/summary]
-  [GET /api/admin/config/reservation-rules]
-  [PUT /api/admin/config/reservation-rules]
+    rectangle "WebSocket接口" {
+        usecase "WS /ws" as API20
+        usecase "SUBSCRIBE /topic/seat/{roomId}" as API21
+        usecase "SEND /app/seat-reserve" as API22
+    }
 }
 
 @enduml

@@ -1,0 +1,141 @@
+@startuml 前端页面结构图
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam component {
+  BackgroundColor #E8F5E8
+  BorderColor #4CAF50
+}
+skinparam package {
+  BackgroundColor #FFF3E0
+  BorderColor #FF9800
+}
+
+title EduSphere 在线教育平台 - 前端页面结构图
+
+package "公共组件 (Common Components)" as CommonComponents {
+  [Header 导航栏] as Header
+  [Footer 页脚] as Footer
+  [Loading 加载组件] as Loading
+  [Error 错误页面] as Error
+}
+
+package "图表组件 (Chart Components)" as ChartComponents {
+  [CourseStatusChart 课程状态图] as CourseStatusChart
+  [UserRoleChart 用户角色图] as UserRoleChart
+  [IncomeTrendChart 收入趋势图] as IncomeTrendChart
+  [LearningProgressChart 学习进度图] as LearningProgressChart
+}
+
+package "学习组件 (Learning Components)" as LearningComponents {
+  [QuizComponent 测验组件] as QuizComponent
+  [VideoPlayer 视频播放器] as VideoPlayer
+  [DocumentViewer 文档查看器] as DocumentViewer
+}
+
+package "页面组件 (Page Components)" as PageComponents {
+  [PlayGround 首页] as PlayGround
+  [Login 登录页] as Login
+  [Register 注册页] as Register
+  [Profile 个人中心] as Profile
+  [NotFound 404页面] as NotFound
+}
+
+package "课程页面 (Course Pages)" as CoursePages {
+  [CourseList 课程列表] as CourseList
+  [CourseDetail 课程详情] as CourseDetail
+  [LearningPage 学习页面] as LearningPage
+}
+
+package "教师页面 (Teacher Pages)" as TeacherPages {
+  [TeacherDashboard 教师工作台] as TeacherDashboard
+  [CourseCreate 课程创建] as CourseCreate
+  [CourseEdit 课程编辑] as CourseEdit
+  [CourseOutline 课程大纲] as CourseOutline
+}
+
+package "管理员页面 (Admin Pages)" as AdminPages {
+  [AdminDashboard 管理后台] as AdminDashboard
+}
+
+package "账户页面 (Account Pages)" as AccountPages {
+  [Recharge 充值页面] as Recharge
+  [MyCourses 我的课程] as MyCourses
+}
+
+' 页面路由关系
+PlayGround --> CourseList : 课程浏览
+PlayGround --> Login : 用户登录
+PlayGround --> Register : 用户注册
+
+Login --> PlayGround : 登录成功
+Login --> TeacherDashboard : 教师登录
+Login --> AdminDashboard : 管理员登录
+
+CourseList --> CourseDetail : 查看详情
+CourseDetail --> LearningPage : 开始学习
+CourseDetail --> Recharge : 余额不足
+
+TeacherDashboard --> CourseCreate : 创建课程
+TeacherDashboard --> CourseEdit : 编辑课程
+TeacherDashboard --> CourseOutline : 管理大纲
+
+AdminDashboard --> CourseList : 课程管理
+AdminDashboard --> Profile : 用户管理
+
+Profile --> MyCourses : 我的课程
+Profile --> Recharge : 账户充值
+
+LearningPage --> QuizComponent : 测验内容
+LearningPage --> VideoPlayer : 视频内容
+LearningPage --> DocumentViewer : 文档内容
+
+' 组件依赖关系
+Header --> Login : 登录入口
+Header --> Profile : 个人中心
+Header --> TeacherDashboard : 教师工作台
+Header --> AdminDashboard : 管理后台
+
+AdminDashboard --> CourseStatusChart : 课程统计
+AdminDashboard --> UserRoleChart : 用户统计
+AdminDashboard --> IncomeTrendChart : 收入统计
+AdminDashboard --> LearningProgressChart : 学习统计
+
+LearningPage --> QuizComponent : 测验功能
+LearningPage --> VideoPlayer : 视频播放
+LearningPage --> DocumentViewer : 文档查看
+
+' 页面说明
+note right of PlayGround
+  **首页**
+  - 热门课程推荐
+  - 最新课程展示
+  - 分类导航
+  - 搜索功能
+end note
+
+note right of TeacherPages
+  **教师功能**
+  - 课程创作管理
+  - 章节课时管理
+  - 课程发布审核
+  - 数据统计查看
+end note
+
+note right of AdminPages
+  **管理后台**
+  - 系统概览
+  - 课程审核管理
+  - 用户权限管理
+  - 数据统计分析
+end note
+
+note right of LearningComponents
+  **学习组件**
+  - 多媒体内容支持
+  - 学习进度跟踪
+  - 测验系统
+  - 响应式设计
+end note
+
+@enduml
+

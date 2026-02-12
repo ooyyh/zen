@@ -1,58 +1,59 @@
-@startuml Frontend Structure
+@startuml Frontend_Page_Structure
 !theme plain
-skinparam backgroundColor #FFFFFF
+skinparam backgroundColor #FEFEFE
+skinparam classBackgroundColor #F0F0F0
 
-title Zen Campus - Frontend Page Structure
+package "前端页面结构" {
+    component [App.vue] as App
 
-package "Shell" {
-  [AppShell]
-  [HomeView]
-  [DashboardView]
-  [LoginView]
-  [RegisterView]
+    package "公共页面" {
+        component [LoginView] as Login
+        component [RegisterView] as Register
+        component [HomeView] as Home
+    }
+
+    package "学生功能页面" {
+        component [DashboardView] as Dashboard
+        component [ClassroomListView] as ClassList
+        component [ReservationListView] as ResList
+        component [EquipmentListView] as EquipList
+        component [LectureListView] as LectureList
+        component [BusTripListView] as BusList
+        component [SeatSelectionView] as SeatSelect
+        component [MessageListView] as MsgList
+    }
+
+    package "教师功能页面" {
+        component [LectureManageView] as LectureMgmt
+        component [ApprovalListView] as ApprovalList
+        component [SeatLayoutEditorView] as SeatEditor
+    }
+
+    package "管理员功能页面" {
+        component [AdminUserView] as UserMgmt
+        component [AdminConfigView] as ConfigMgmt
+        component [AdminReportView] as ReportView
+        component [AdminBroadcastView] as BroadcastMgmt
+    }
+
+    App --> Login
+    App --> Register
+    App --> Home
+    App --> Dashboard
+    App --> ClassList
+    App --> ResList
+    App --> EquipList
+    App --> LectureList
+    App --> BusList
+    App --> SeatSelect
+    App --> MsgList
+    App --> LectureMgmt
+    App --> ApprovalList
+    App --> SeatEditor
+    App --> UserMgmt
+    App --> ConfigMgmt
+    App --> ReportView
+    App --> BroadcastMgmt
 }
-
-package "Student Pages" {
-  [ClassroomListView]
-  [ReservationCreateView]
-  [ReservationListView]
-  [LectureListView]
-  [LectureSignupListView]
-  [EquipmentListView]
-  [EquipmentBorrowListView]
-  [BusTripListView]
-  [BusBookingListView]
-  [StudyRoomListView]
-  [SeatSelectionView]
-  [SeatReservationListView]
-  [MessageListView]
-}
-
-package "Admin Pages" {
-  [ApprovalListView]
-  [AdminReportView]
-  [AdminUserView]
-  [AdminClassroomView]
-  [AdminLectureView]
-  [AdminEquipmentView]
-  [AdminBusRouteView]
-  [AdminBusTripView]
-  [AdminStudyRoomView]
-  [AdminSeatManagementView]
-  [AdminMessageTemplateView]
-  [AdminConfigView]
-}
-
-package "Services" {
-  [router/index.js]
-  [services/api.js]
-  [services/auth.js]
-  [services/websocket.js]
-}
-
-AppShell --> "Student Pages"
-AppShell --> "Admin Pages"
-"Student Pages" --> "Services"
-"Admin Pages" --> "Services"
 
 @enduml

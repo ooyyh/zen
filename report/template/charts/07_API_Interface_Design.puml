@@ -1,0 +1,157 @@
+@startuml API接口设计图
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam component {
+  BackgroundColor #E3F2FD
+  BorderColor #1976D2
+}
+skinparam package {
+  BackgroundColor #FFF3E0
+  BorderColor #FF9800
+}
+
+title EduSphere 在线教育平台 - API接口设计图
+
+package "认证模块 (Auth Module)" as AuthModule {
+  [POST /user/register] as RegisterAPI
+  [POST /user/login] as LoginAPI
+  [GET /user/profile] as ProfileAPI
+  [PUT /user/profile] as UpdateProfileAPI
+  [PUT /user/password] as ChangePasswordAPI
+}
+
+package "课程模块 (Course Module)" as CourseModule {
+  [GET /course/{id}] as GetCourseAPI
+  [POST /course/search] as SearchCourseAPI
+  [GET /course/hot] as HotCourseAPI
+  [GET /course/new] as NewCourseAPI
+  [GET /course/category/{id}] as CategoryCourseAPI
+  [GET /course/{id}/outline] as CourseOutlineAPI
+}
+
+package "教师模块 (Teacher Module)" as TeacherModule {
+  [GET /teacher/courses] as TeacherCoursesAPI
+  [POST /teacher/courses] as CreateCourseAPI
+  [PUT /teacher/courses/{id}] as UpdateCourseAPI
+  [DELETE /teacher/courses/{id}] as DeleteCourseAPI
+  [POST /teacher/courses/{id}/publish] as PublishCourseAPI
+  [GET /teacher/courses/{id}/sections] as GetSectionsAPI
+  [POST /teacher/courses/{id}/sections] as CreateSectionAPI
+  [PUT /teacher/sections/{id}] as UpdateSectionAPI
+  [DELETE /teacher/sections/{id}] as DeleteSectionAPI
+  [GET /teacher/sections/{id}/lessons] as GetLessonsAPI
+  [POST /teacher/sections/{id}/lessons] as CreateLessonAPI
+  [PUT /teacher/lessons/{id}] as UpdateLessonAPI
+  [DELETE /teacher/lessons/{id}] as DeleteLessonAPI
+}
+
+package "学习模块 (Learning Module)" as LearningModule {
+  [POST /learning/progress] as RecordProgressAPI
+  [GET /learning/progress/{courseId}] as GetProgressAPI
+  [POST /learning/complete/{lessonId}] as CompleteLessonAPI
+  [GET /learning/records] as GetRecordsAPI
+}
+
+package "购买模块 (Purchase Module)" as PurchaseModule {
+  [POST /purchase/course] as PurchaseCourseAPI
+  [GET /purchase/my-courses] as MyCoursesAPI
+  [GET /purchase/check/{courseId}] as CheckPurchaseAPI
+}
+
+package "充值模块 (Recharge Module)" as RechargeModule {
+  [POST /balance/recharge] as RechargeAPI
+  [GET /balance/info] as BalanceInfoAPI
+  [GET /balance/recharge-history] as RechargeHistoryAPI
+}
+
+package "管理员模块 (Admin Module)" as AdminModule {
+  [GET /admin/overview] as AdminOverviewAPI
+  [GET /admin/courses] as AdminCoursesAPI
+  [GET /admin/courses/pending] as PendingCoursesAPI
+  [POST /admin/courses/{id}/approve] as ApproveCourseAPI
+  [POST /admin/courses/{id}/reject] as RejectCourseAPI
+  [DELETE /admin/courses/{id}] as DeleteCourseAdminAPI
+  [GET /admin/courses/stats] as CourseStatsAPI
+  [GET /admin/users] as AdminUsersAPI
+  [GET /admin/users/stats] as UserStatsAPI
+  [PUT /admin/users/{id}/toggle] as ToggleUserAPI
+  [DELETE /admin/users/{id}] as DeleteUserAPI
+  [GET /admin/income/stats] as IncomeStatsAPI
+  [GET /admin/learning/stats] as LearningStatsAPI
+}
+
+package "首页模块 (Home Module)" as HomeModule {
+  [GET /home/data] as HomeDataAPI
+  [GET /category/list] as CategoryListAPI
+  [GET /category/{id}] as CategoryDetailAPI
+}
+
+' API分组关系
+AuthModule --> CourseModule : 认证后访问
+AuthModule --> TeacherModule : 教师权限
+AuthModule --> LearningModule : 学习权限
+AuthModule --> PurchaseModule : 购买权限
+AuthModule --> RechargeModule : 充值权限
+AuthModule --> AdminModule : 管理员权限
+
+CourseModule --> LearningModule : 课程学习
+CourseModule --> PurchaseModule : 课程购买
+
+TeacherModule --> CourseModule : 课程管理
+AdminModule --> CourseModule : 课程审核
+AdminModule --> TeacherModule : 教师管理
+
+' 权限说明
+note right of AuthModule
+  **认证模块**
+  - 用户注册登录
+  - JWT Token认证
+  - 个人信息管理
+  - 密码修改功能
+end note
+
+note right of TeacherModule
+  **教师模块**
+  - 课程CRUD操作
+  - 章节课时管理
+  - 课程发布审核
+  - 教师工作台功能
+end note
+
+note right of LearningModule
+  **学习模块**
+  - 学习进度跟踪
+  - 课时完成记录
+  - 学习记录查询
+  - 多媒体内容支持
+end note
+
+note right of PurchaseModule
+  **购买模块**
+  - 课程购买流程
+  - 购买状态检查
+  - 我的课程管理
+  - 余额扣除处理
+end note
+
+note right of AdminModule
+  **管理员模块**
+  - 系统概览统计
+  - 课程审核管理
+  - 用户权限管理
+  - 数据统计分析
+end note
+
+' API设计原则
+note bottom
+  **API设计原则**
+  - RESTful API设计规范
+  - 统一的响应格式
+  - JWT身份认证
+  - 角色权限控制
+  - 异常处理机制
+  - CORS跨域支持
+end note
+
+@enduml
+

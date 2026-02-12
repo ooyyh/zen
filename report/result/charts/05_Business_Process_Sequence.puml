@@ -1,39 +1,44 @@
-@startuml Seat Reservation Sequence
+@startuml Business_Process_Sequence
 !theme plain
-skinparam backgroundColor #FFFFFF
+skinparam backgroundColor #FEFEFE
+skinparam sequenceActorBackgroundColor #F0F0F0
 
-title Zen Campus - Seat Reservation Sequence
+actor 学生
+participant 前端
+participant 后端
+database Redis
+database MySQL
 
-actor Student
-participant Frontend
-participant SeatStatusController
-participant SeatReservationService
-participant Redis
-participant MySQL
-participant WebSocket
-participant MessageService
+学生 -> 前端: 点击座位预约
+activate 前端
+前端 -> 后端: POST /api/seat/reserve
+activate 后端
 
-Student -> Frontend: select seat
-Frontend -> SeatStatusController: mark pending
-SeatStatusController -> SeatReservationService: markSeatPending
-SeatReservationService -> Redis: set seat:pending:* TTL 30s
-SeatReservationService -> WebSocket: broadcast PENDING
+后端 -> Redis: 获取分布式锁\n(seat:lock:{seatId})
+activate Redis
+Redis --> 后端: 锁获取成功
+deactivate Redis
 
-Student -> Frontend: confirm reservation
-Frontend -> SeatReservationService: reserve seat
-SeatReservationService -> Redis: tryLock lock:seat:*
-alt lock acquired
-  SeatReservationService -> MySQL: check overlap
-  alt no conflict
-    SeatReservationService -> MySQL: insert seat_reservation
-    SeatReservationService -> WebSocket: broadcast RESERVED
-    SeatReservationService -> MessageService: send template message
-  else conflict
-    SeatReservationService --> Frontend: conflict error
-  end
-  SeatReservationService -> Redis: unlock
-else lock failed
-  SeatReservationService --> Frontend: retry later
-end
+后端 -> MySQL: 查询座位状态
+activate MySQL
+MySQL --> 后端: 座位未被预约
+deactivate MySQL
+
+后端 -> MySQL: 保存预约记录
+activate MySQL
+MySQL --> 后端: 保存成功
+deactivate MySQL
+
+后端 -> Redis: 释放分布式锁
+activate Redis
+Redis --> 后端: 锁释放成功
+deactivate Redis
+
+后端 -> 前端: 返回预约成功
+deactivate 后端
+
+前端 -> 前端: 通过WebSocket\n接收座位更新
+前端 -> 学生: 显示座位已预约
+deactivate 前端
 
 @enduml

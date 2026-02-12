@@ -1,0 +1,116 @@
+@startuml 用户角色权限图
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam actor {
+  BackgroundColor #E8F5E8
+  BorderColor #4CAF50
+}
+skinparam package {
+  BackgroundColor #FFF3E0
+  BorderColor #FF9800
+}
+
+title EduSphere 在线教育平台 - 用户角色权限图
+
+actor "管理员 (Admin)" as Admin
+actor "教师 (Teacher)" as Teacher
+actor "学生 (Student)" as Student
+
+package "系统管理权限" as AdminPermissions {
+  [用户管理] as UserManage
+  [课程审核] as CourseReview
+  [数据统计] as DataStats
+  [系统概览] as SystemOverview
+  [收入统计] as IncomeStats
+  [学习统计] as LearningStats
+  [删除课程] as DeleteCourse
+  [删除用户] as DeleteUser
+  [用户状态管理] as UserStatus
+}
+
+package "教师创作权限" as TeacherPermissions {
+  [教师工作台] as TeacherDashboard
+  [创建课程] as CreateCourse
+  [编辑课程] as EditCourse
+  [删除课程] as DeleteOwnCourse
+  [课程大纲管理] as CourseOutline
+  [章节管理] as SectionManage
+  [课时管理] as LessonManage
+  [课程发布] as PublishCourse
+  [课程统计] as CourseStats
+  [购买其他课程] as BuyCourse
+}
+
+package "学生学习权限" as StudentPermissions {
+  [浏览课程] as BrowseCourse
+  [搜索课程] as SearchCourse
+  [查看课程详情] as ViewCourseDetail
+  [购买课程] as PurchaseCourse
+  [学习课程] as LearnCourse
+  [查看学习进度] as ViewProgress
+  [课程评价] as ReviewCourse
+  [个人中心] as PersonalCenter
+  [余额充值] as RechargeBalance
+  [我的课程] as MyCourses
+}
+
+package "公共权限" as CommonPermissions {
+  [用户注册] as Register
+  [用户登录] as Login
+  [个人信息管理] as ProfileManage
+  [密码修改] as ChangePassword
+  [头像上传] as UploadAvatar
+  [首页访问] as HomeAccess
+}
+
+' 权限分配关系
+Admin --> AdminPermissions
+Admin --> TeacherPermissions : "管理员可访问教师功能"
+Admin --> StudentPermissions : "管理员可访问学生功能"
+Admin --> CommonPermissions
+
+Teacher --> TeacherPermissions
+Teacher --> StudentPermissions : "教师可购买其他课程"
+Teacher --> CommonPermissions
+
+Student --> StudentPermissions
+Student --> CommonPermissions
+
+' 权限说明
+note right of AdminPermissions
+  **管理员权限**
+  - 系统全局管理
+  - 用户和课程管理
+  - 数据统计分析
+  - 收入和学习统计
+end note
+
+note right of TeacherPermissions
+  **教师权限**
+  - 课程创作管理
+  - 章节课时管理
+  - 课程发布审核
+  - 购买其他课程
+end note
+
+note right of StudentPermissions
+  **学生权限**
+  - 课程浏览学习
+  - 购买和充值
+  - 学习进度跟踪
+  - 课程评价
+end note
+
+note right of CommonPermissions
+  **公共权限**
+  - 基础用户功能
+  - 个人信息管理
+  - 系统访问权限
+end note
+
+' 权限继承关系
+AdminPermissions ..> TeacherPermissions : 继承
+AdminPermissions ..> StudentPermissions : 继承
+TeacherPermissions ..> StudentPermissions : 部分继承
+
+@enduml

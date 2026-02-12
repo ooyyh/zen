@@ -1,57 +1,37 @@
-@startuml Functional Modules
+@startuml Functional_Modules
 !theme plain
-skinparam backgroundColor #FFFFFF
-skinparam packageStyle rectangle
+skinparam backgroundColor #FEFEFE
+skinparam classBackgroundColor #F0F0F0
 
-title Zen Campus - Functional Modules
-
-package "Auth and RBAC" {
-  [Login/Register]
-  [JWT Auth]
-  [Role Permission]
+package "Zen 校园综合服务系统" {
+    component [用户认证模块] as Auth
+    component [教室预约模块] as Classroom
+    component [设备借用模块] as Equipment
+    component [讲座报名模块] as Lecture
+    component [校车预约模块] as Bus
+    component [座位预约模块] as Seat
+    component [通知系统模块] as Notification
+    component [运营报表模块] as Report
 }
 
-package "Classroom Reservation" {
-  [Resource List]
-  [Create Reservation]
-  [Approval Workflow]
-  [Timeline]
-}
+Auth --> Classroom : 权限检查
+Auth --> Equipment : 权限检查
+Auth --> Lecture : 权限检查
+Auth --> Bus : 权限检查
+Auth --> Seat : 权限检查
+Auth --> Notification : 权限检查
+Auth --> Report : 权限检查
 
-package "Lecture" {
-  [Publish Lecture]
-  [Signup]
-  [Waitlist]
-  [Check-in]
-}
+Classroom --> Notification : 发送通知
+Equipment --> Notification : 发送通知
+Lecture --> Notification : 发送通知
+Bus --> Notification : 发送通知
+Seat --> Notification : 发送通知
 
-package "Equipment Borrow" {
-  [Equipment Catalog]
-  [Borrow Request]
-  [Approve/Reject]
-  [Return]
-}
-
-package "Campus Bus" {
-  [Route Management]
-  [Trip Management]
-  [Booking]
-  [Waitlist Promotion]
-}
-
-package "Study Room" {
-  [Room and Seat List]
-  [Seat Reservation]
-  [Pending Seat TTL]
-  [Realtime Seat Status]
-}
-
-package "Messaging and Ops" {
-  [Message Templates]
-  [Inbox]
-  [Broadcast]
-  [Rule Config]
-  [Dashboard and Reports]
-}
+Report --> Classroom : 数据统计
+Report --> Equipment : 数据统计
+Report --> Lecture : 数据统计
+Report --> Bus : 数据统计
+Report --> Seat : 数据统计
 
 @enduml

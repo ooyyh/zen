@@ -1,77 +1,36 @@
-@startuml System Architecture
+@startuml System_Architecture
 !theme plain
-skinparam backgroundColor #FFFFFF
-skinparam componentStyle rectangle
+skinparam backgroundColor #FEFEFE
+skinparam classBackgroundColor #F0F0F0
+skinparam classBorderColor #333333
 
-title Zen Campus - System Architecture
-
-package "Client Layer" {
-  [Web Browser] as Browser
-  [Mobile Browser] as Mobile
+package "前端应用层" {
+    component [Vue 3 SPA] as Frontend
+    component [Vite 构建工具] as Vite
+    component [WebSocket 客户端] as WSClient
 }
 
-package "Frontend Layer" {
-  [Vue 3 App] as VueApp
-  [Vue Router] as Router
-  [ECharts Dashboard] as Echarts
-  [STOMP Client] as Stomp
-  [API Service] as Api
+package "后端服务层" {
+    component [Spring Boot 应用] as Backend
+    component [REST API 接口] as API
+    component [WebSocket 服务] as WSServer
+    component [业务逻辑层] as Service
 }
 
-package "Backend Layer" {
-  [Spring Boot] as Boot
-  [Auth Interceptor] as Auth
-  [Global Exception Handler] as Ex
-  [WebSocket Config] as WsCfg
+package "数据存储层" {
+    database [MySQL 8.0] as MySQL
+    database [Redis 6.0+] as Redis
 }
 
-package "Service Layer" {
-  [ReservationService] as S1
-  [LectureService] as S2
-  [EquipmentBorrowService] as S3
-  [BusBookingService] as S4
-  [SeatReservationService] as S5
-  [MessageService] as S6
-  [ReportService] as S7
-}
+Frontend --> Vite : 构建
+Frontend --> API : HTTP 请求
+Frontend --> WSClient : WebSocket
+WSClient --> WSServer : 实时通信
 
-package "Data and Infra" {
-  [MyBatis Mapper] as Mapper
-  database "MySQL" as MySQL
-  [Redis + Redisson] as Redis
-  [STOMP Broker /topic] as Broker
-}
-
-Browser --> VueApp
-Mobile --> VueApp
-VueApp --> Router
-VueApp --> Echarts
-VueApp --> Stomp
-VueApp --> Api
-Api --> Boot
-Stomp --> WsCfg
-Boot --> Auth
-Boot --> Ex
-Boot --> S1
-Boot --> S2
-Boot --> S3
-Boot --> S4
-Boot --> S5
-Boot --> S6
-Boot --> S7
-S1 --> Mapper
-S2 --> Mapper
-S3 --> Mapper
-S4 --> Mapper
-S5 --> Mapper
-S6 --> Mapper
-S7 --> Mapper
-Mapper --> MySQL
-S1 --> Redis
-S2 --> Redis
-S3 --> Redis
-S4 --> Redis
-S5 --> Redis
-S5 --> Broker
+Backend --> API : 提供接口
+Backend --> Service : 业务处理
+Backend --> WSServer : 推送消息
+Service --> MySQL : 数据操作
+Service --> Redis : 缓存/分布式锁
 
 @enduml

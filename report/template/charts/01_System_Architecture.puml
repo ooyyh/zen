@@ -1,0 +1,129 @@
+@startuml 系统架构图
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam componentStyle rectangle
+
+title EduSphere 在线教育平台 - 系统架构图
+
+package "客户端层 (Client Layer)" {
+  [Web浏览器] as Browser
+  [移动端浏览器] as Mobile
+}
+
+package "前端层 (Frontend Layer)" {
+  [Vue 3 应用] as VueApp
+  [Element Plus UI] as UI
+  [Vue Router] as Router
+  [Pinia 状态管理] as Pinia
+  [Axios HTTP客户端] as Axios
+}
+
+package "网络层 (Network Layer)" {
+  [HTTP/HTTPS] as HTTP
+  [CORS 跨域] as CORS
+}
+
+package "后端层 (Backend Layer)" {
+  [Spring Boot 应用] as SpringBoot
+  [JWT 认证] as JWT
+  [全局异常处理] as ExceptionHandler
+  [CORS 配置] as CORSConfig
+}
+
+package "业务层 (Business Layer)" {
+  [用户管理服务] as UserService
+  [课程管理服务] as CourseService
+  [教师服务] as TeacherService
+  [管理员服务] as AdminService
+  [学习服务] as LearningService
+  [购买服务] as PurchaseService
+  [充值服务] as RechargeService
+}
+
+package "数据访问层 (Data Access Layer)" {
+  [MyBatis-Plus] as MyBatis
+  [Mapper 接口] as Mapper
+  [XML 映射文件] as XML
+}
+
+package "数据层 (Data Layer)" {
+  database "MySQL 8.0" as MySQL {
+    [用户表] as UserTable
+    [课程表] as CourseTable
+    [分类表] as CategoryTable
+    [章节表] as SectionTable
+    [课时表] as LessonTable
+    [学习进度表] as ProgressTable
+    [购买记录表] as PurchaseTable
+    [充值记录表] as RechargeTable
+    [用户余额表] as BalanceTable
+  }
+}
+
+' 连接关系
+Browser --> VueApp
+Mobile --> VueApp
+VueApp --> UI
+VueApp --> Router
+VueApp --> Pinia
+VueApp --> Axios
+Axios --> HTTP
+HTTP --> SpringBoot
+SpringBoot --> JWT
+SpringBoot --> ExceptionHandler
+SpringBoot --> CORSConfig
+SpringBoot --> UserService
+SpringBoot --> CourseService
+SpringBoot --> TeacherService
+SpringBoot --> AdminService
+SpringBoot --> LearningService
+SpringBoot --> PurchaseService
+SpringBoot --> RechargeService
+UserService --> MyBatis
+CourseService --> MyBatis
+TeacherService --> MyBatis
+AdminService --> MyBatis
+LearningService --> MyBatis
+PurchaseService --> MyBatis
+RechargeService --> MyBatis
+MyBatis --> Mapper
+Mapper --> XML
+XML --> MySQL
+MySQL --> UserTable
+MySQL --> CourseTable
+MySQL --> CategoryTable
+MySQL --> SectionTable
+MySQL --> LessonTable
+MySQL --> ProgressTable
+MySQL --> PurchaseTable
+MySQL --> RechargeTable
+MySQL --> BalanceTable
+
+note right of VueApp
+  **前端技术栈**
+  - Vue 3 + Composition API
+  - Element Plus UI组件库
+  - Vue Router 4 路由管理
+  - Pinia 状态管理
+  - Axios HTTP请求
+  - Vite 构建工具
+end note
+
+note right of SpringBoot
+  **后端技术栈**
+  - Spring Boot 2.6.13
+  - MyBatis-Plus ORM
+  - JWT 身份认证
+  - Maven 依赖管理
+  - JDK 8+
+end note
+
+note right of MySQL
+  **数据库设计**
+  - MySQL 8.0
+  - 11个核心业务表
+  - 支持事务处理
+  - 索引优化
+end note
+
+@enduml

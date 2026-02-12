@@ -1,0 +1,228 @@
+@startuml 数据库ER图
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam entity {
+  BackgroundColor #E1F5FE
+  BorderColor #0277BD
+}
+skinparam relationship {
+  BackgroundColor #FFF3E0
+  BorderColor #F57C00
+}
+
+title EduSphere 在线教育平台 - 数据库ER图
+
+entity "用户表 (user)" as User {
+  * id : INT <<PK>>
+  --
+  username : VARCHAR(50) <<UK>>
+  password : VARCHAR(255)
+  email : VARCHAR(100)
+  avatar : TEXT
+  role : ENUM(admin,teacher,student)
+  status : TINYINT
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "课程分类表 (category)" as Category {
+  * id : INT <<PK>>
+  --
+  name : VARCHAR(50)
+  slug : VARCHAR(50) <<UK>>
+  description : TEXT
+  icon : VARCHAR(100)
+  color : VARCHAR(20)
+  sort_order : INT
+  status : TINYINT
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "课程表 (course)" as Course {
+  * id : INT <<PK>>
+  --
+  title : VARCHAR(200)
+  subtitle : VARCHAR(300)
+  description : TEXT
+  cover_image : TEXT
+  instructor_id : INT <<FK>>
+  category_id : INT <<FK>>
+  price : DECIMAL(10,2)
+  original_price : DECIMAL(10,2)
+  is_free : TINYINT
+  level : ENUM(beginner,intermediate,advanced)
+  duration : VARCHAR(50)
+  student_count : INT
+  rating : DECIMAL(3,2)
+  rating_count : INT
+  is_hot : TINYINT
+  is_new : TINYINT
+  status : ENUM(draft,pending,published,rejected)
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "课程章节表 (course_section)" as CourseSection {
+  * id : INT <<PK>>
+  --
+  course_id : INT <<FK>>
+  title : VARCHAR(200)
+  description : TEXT
+  sort_order : INT
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "课程课时表 (course_lesson)" as CourseLesson {
+  * id : INT <<PK>>
+  --
+  section_id : INT <<FK>>
+  title : VARCHAR(200)
+  description : TEXT
+  type : ENUM(video,document,quiz)
+  duration : VARCHAR(20)
+  video_url : VARCHAR(500)
+  document_url : VARCHAR(500)
+  is_free : TINYINT
+  sort_order : INT
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "学习进度表 (learning_progress)" as LearningProgress {
+  * id : INT <<PK>>
+  --
+  user_id : INT <<FK>>
+  course_id : INT <<FK>>
+  lesson_id : INT <<FK>>
+  progress_percent : DECIMAL(5,2)
+  is_completed : TINYINT
+  last_learn_time : TIMESTAMP
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "用户余额表 (user_balance)" as UserBalance {
+  * id : INT <<PK>>
+  --
+  user_id : INT <<FK>>
+  balance : DECIMAL(10,2)
+  frozen_balance : DECIMAL(10,2)
+  total_recharge : DECIMAL(10,2)
+  total_consumption : DECIMAL(10,2)
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "充值记录表 (recharge_record)" as RechargeRecord {
+  * id : INT <<PK>>
+  --
+  user_id : INT <<FK>>
+  amount : DECIMAL(10,2)
+  balance_before : DECIMAL(10,2)
+  balance_after : DECIMAL(10,2)
+  recharge_type : ENUM(manual,system)
+  remark : VARCHAR(500)
+  created_at : TIMESTAMP
+}
+
+entity "购买记录表 (purchase_record)" as PurchaseRecord {
+  * id : INT <<PK>>
+  --
+  user_id : INT <<FK>>
+  course_id : INT <<FK>>
+  instructor_id : INT <<FK>>
+  purchase_price : DECIMAL(10,2)
+  balance_before : DECIMAL(10,2)
+  balance_after : DECIMAL(10,2)
+  instructor_income : DECIMAL(10,2)
+  platform_fee : DECIMAL(10,2)
+  status : ENUM(success,failed,refunded)
+  created_at : TIMESTAMP
+}
+
+entity "讲师收入表 (instructor_income)" as InstructorIncome {
+  * id : INT <<PK>>
+  --
+  instructor_id : INT <<FK>>
+  course_id : INT <<FK>>
+  purchase_record_id : INT <<FK>>
+  income_amount : DECIMAL(10,2)
+  total_income : DECIMAL(10,2)
+  created_at : TIMESTAMP
+}
+
+entity "用户课程关系表 (user_course)" as UserCourse {
+  * id : INT <<PK>>
+  --
+  user_id : INT <<FK>>
+  course_id : INT <<FK>>
+  purchase_price : DECIMAL(10,2)
+  purchase_time : TIMESTAMP
+  status : TINYINT
+  created_at : TIMESTAMP
+}
+
+entity "课程评价表 (course_review)" as CourseReview {
+  * id : INT <<PK>>
+  --
+  user_id : INT <<FK>>
+  course_id : INT <<FK>>
+  rating : TINYINT
+  content : TEXT
+  status : TINYINT
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+' 关系定义
+User ||--o{ Course : "instructor_id"
+Category ||--o{ Course : "category_id"
+Course ||--o{ CourseSection : "course_id"
+CourseSection ||--o{ CourseLesson : "section_id"
+User ||--o{ LearningProgress : "user_id"
+Course ||--o{ LearningProgress : "course_id"
+CourseLesson ||--o{ LearningProgress : "lesson_id"
+User ||--o{ UserBalance : "user_id"
+User ||--o{ RechargeRecord : "user_id"
+User ||--o{ PurchaseRecord : "user_id"
+Course ||--o{ PurchaseRecord : "course_id"
+User ||--o{ InstructorIncome : "instructor_id"
+Course ||--o{ InstructorIncome : "course_id"
+PurchaseRecord ||--o{ InstructorIncome : "purchase_record_id"
+User ||--o{ UserCourse : "user_id"
+Course ||--o{ UserCourse : "course_id"
+User ||--o{ CourseReview : "user_id"
+Course ||--o{ CourseReview : "course_id"
+
+note right of User
+  **用户表**
+  - 支持三种角色
+  - 存储用户基本信息
+  - 状态管理
+end note
+
+note right of Course
+  **课程表**
+  - 课程基本信息
+  - 价格和状态管理
+  - 统计信息
+end note
+
+note right of LearningProgress
+  **学习进度表**
+  - 跟踪学习进度
+  - 支持课程和课时级别
+  - 完成状态管理
+end note
+
+note right of PurchaseRecord
+  **购买记录表**
+  - 完整的购买流程记录
+  - 支持退款处理
+  - 收入分配记录
+end note
+
+@enduml
+
