@@ -1,4 +1,4 @@
-# Zen Campus 校园综合服务系统
+# Zen Campus 校园综合服务系统 [狼堡六号]
 
 <div align="center">
 
